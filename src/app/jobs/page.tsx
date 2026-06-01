@@ -1,4 +1,4 @@
-import { supabase } from "@/lib/supabase";
+import { supabase } from "@/src/lib/supabase";
 
 export default async function JobPage() {
     const { data:jobs } = await supabase.from("jobs").select("*");
@@ -18,7 +18,7 @@ export default async function JobPage() {
                     </h2>
                     <p>{job.description}</p>
                     <p>Location: {job.location}</p>
-                    <p>Salary: {job.salary}</p>
+                    <p>Salary: {job.salary_range}</p>
                 </div>
             ))}
         </div>
