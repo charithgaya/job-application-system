@@ -130,21 +130,24 @@ export default function RecruiterDashboard() {
   );
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 py-12 px-4 sm:px-6 lg:px-8 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-900 via-slate-950 to-slate-950">
+    <div className="min-h-screen bg-[#F8FAFC] text-slate-800 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-6xl mx-auto">
         
         {/* Banner Alert Messages */}
         {statusMessage && (
-          <div className={`fixed top-5 right-5 z-50 p-4 rounded-xl shadow-2xl border flex items-center gap-3 animate-slide-in max-w-md ${
+          <div className={`fixed top-5 right-5 z-50 p-4 rounded-xl shadow-lg border flex items-center gap-3 animate-slide-in max-w-md ${
             statusMessage.type === "success" 
-              ? "bg-emerald-950/90 border-emerald-800 text-emerald-300" 
-              : "bg-rose-950/90 border-rose-800 text-rose-300"
+              ? "bg-emerald-50 border-emerald-200 text-emerald-800" 
+              : "bg-red-50 border-red-200 text-red-800"
           }`}>
             <span className="text-sm font-semibold">{statusMessage.text}</span>
             <button
-              aria-label="Close alert"
               type="button"
-              onClick={() => setStatusMessage(null)} className="text-slate-400 hover:text-slate-200">
+              aria-label="Close alert" 
+              onClick={() => setStatusMessage(null)} 
+              className="text-slate-400
+              hover:text-slate-600"
+            >
               <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
@@ -153,12 +156,12 @@ export default function RecruiterDashboard() {
         )}
 
         {/* Dashboard Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 mb-10 pb-6 border-b border-slate-800/80">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 mb-10 pb-6 border-b border-slate-100">
           <div>
-            <h1 className="text-3xl font-extrabold tracking-tight bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
+            <h1 className="text-3xl font-extrabold tracking-tight text-[#1E293B]">
               Recruiter Dashboard
             </h1>
-            <p className="mt-2 text-slate-400 text-sm sm:text-base">
+            <p className="mt-2 text-slate-500 text-sm sm:text-base">
               {user ? `Logged in as: ${user.email}` : "Manage and track your active job opportunities."}
             </p>
           </div>
@@ -166,7 +169,7 @@ export default function RecruiterDashboard() {
           <div>
             <Link
               href="/recruiter/create-job"
-              className="inline-flex items-center gap-2 px-5 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-bold rounded-xl shadow-lg shadow-indigo-950/30 transition-all hover:-translate-y-0.5 active:translate-y-0 text-sm active:scale-98"
+              className="inline-flex items-center gap-2 px-5 py-3 bg-[#F97316] hover:bg-orange-600 text-white font-bold rounded-xl shadow-md shadow-orange-500/10 transition-all hover:-translate-y-0.5 active:translate-y-0 text-sm active:scale-98"
             >
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                 <path fillRule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clipRule="evenodd" />
@@ -182,25 +185,25 @@ export default function RecruiterDashboard() {
             {loading ? (
               // Loading Stats Skeleton
               [1, 2].map((n) => (
-                <div key={n} className="bg-slate-900/40 border border-slate-900 rounded-3xl p-6 flex items-center justify-between animate-pulse">
+                <div key={n} className="bg-white border border-slate-100 rounded-3xl p-6 flex items-center justify-between animate-pulse shadow-sm">
                   <div className="space-y-2.5 flex-1">
-                    <div className="h-4 bg-slate-800 rounded w-1/3"></div>
-                    <div className="h-8 bg-slate-800 rounded w-1/4"></div>
-                    <div className="h-3 bg-slate-800 rounded w-1/2"></div>
+                    <div className="h-4 bg-slate-100 rounded w-1/3"></div>
+                    <div className="h-8 bg-slate-100 rounded w-1/4"></div>
+                    <div className="h-3 bg-slate-100 rounded w-1/2"></div>
                   </div>
-                  <div className="h-14 w-14 bg-slate-800 rounded-2xl"></div>
+                  <div className="h-14 w-14 bg-slate-100 rounded-2xl"></div>
                 </div>
               ))
             ) : (
               <>
                 {/* Total Jobs Posted */}
-                <div className="bg-slate-900/40 border border-slate-900 rounded-3xl p-6 flex items-center justify-between backdrop-blur-xl hover:border-slate-800 transition duration-300">
+                <div className="bg-white border border-slate-100 rounded-3xl p-6 flex items-center justify-between shadow-sm hover:shadow-md transition duration-300">
                   <div>
-                    <p className="text-sm font-medium text-slate-400">Total Jobs Posted</p>
-                    <h3 className="text-3xl font-extrabold text-slate-100 mt-1.5">{jobs.length}</h3>
-                    <p className="text-xs text-indigo-400/80 mt-1">Opportunities published</p>
+                    <p className="text-sm font-semibold text-slate-500">Total Jobs Posted</p>
+                    <h3 className="text-3xl font-extrabold text-[#1E293B] mt-1.5">{jobs.length}</h3>
+                    <p className="text-xs text-blue-600 mt-1">Opportunities published</p>
                   </div>
-                  <div className="p-4 bg-indigo-950/40 border border-indigo-900/60 rounded-2xl text-indigo-400">
+                  <div className="p-4 bg-blue-50 border border-blue-100 rounded-2xl text-[#2563EB]">
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V5a3 3 0 00-3-3h-2a3 3 0 00-3 3v1m8 0H6m9 0H9m1.8 13.2h2.4M12 15V3" />
                     </svg>
@@ -208,15 +211,15 @@ export default function RecruiterDashboard() {
                 </div>
 
                 {/* Most Recent Job Date */}
-                <div className="bg-slate-900/40 border border-slate-900 rounded-3xl p-6 flex items-center justify-between backdrop-blur-xl hover:border-slate-800 transition duration-300">
+                <div className="bg-white border border-slate-100 rounded-3xl p-6 flex items-center justify-between shadow-sm hover:shadow-md transition duration-300">
                   <div>
-                    <p className="text-sm font-medium text-slate-400">Most Recent Post</p>
-                    <h3 className="text-2xl font-bold text-slate-100 mt-1.5">
+                    <p className="text-sm font-semibold text-slate-500">Most Recent Post</p>
+                    <h3 className="text-2xl font-bold text-[#1E293B] mt-1.5">
                       {jobs.length > 0 ? formatDate(jobs[0].created_at) : "No listings yet"}
                     </h3>
-                    <p className="text-xs text-purple-400/80 mt-1.5">Last activity date</p>
+                    <p className="text-xs text-purple-600 mt-1.5">Last activity date</p>
                   </div>
-                  <div className="p-4 bg-purple-950/40 border border-purple-900/60 rounded-2xl text-purple-400">
+                  <div className="p-4 bg-purple-50 border border-purple-100 rounded-2xl text-purple-600">
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                     </svg>
@@ -229,15 +232,15 @@ export default function RecruiterDashboard() {
 
         {/* Main Interface Content */}
         {error ? (
-          <div className="p-8 rounded-2xl bg-slate-900/40 border border-slate-850 text-center max-w-xl mx-auto">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-rose-500 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <div className="p-8 rounded-2xl bg-white border border-slate-150 text-center max-w-xl mx-auto shadow-sm">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-red-500 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
             </svg>
-            <h3 className="text-lg font-bold text-slate-200 mb-2">Access Restrained</h3>
-            <p className="text-slate-400 text-sm mb-6">{error}</p>
+            <h3 className="text-lg font-bold text-slate-800 mb-2">Access Restrained</h3>
+            <p className="text-slate-500 text-sm mb-6">{error}</p>
             <Link 
               href="/recruiter/login" 
-              className="inline-block px-6 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold rounded-xl text-sm transition"
+              className="inline-block px-6 py-2.5 bg-slate-800 hover:bg-slate-700 text-white font-semibold rounded-xl text-sm transition"
             >
               Go to Login
             </Link>
@@ -246,19 +249,19 @@ export default function RecruiterDashboard() {
           renderSkeleton()
         ) : jobs.length === 0 ? (
           /* Empty State View */
-          <div className="p-12 text-center rounded-3xl bg-slate-900/20 border border-slate-900 backdrop-blur-xl max-w-2xl mx-auto py-16">
-            <div className="w-16 h-16 rounded-2xl bg-indigo-950/40 border border-indigo-900 flex items-center justify-center mx-auto mb-6 text-indigo-400">
+          <div className="p-12 text-center rounded-3xl bg-white border border-slate-100 shadow-sm max-w-2xl mx-auto py-16">
+            <div className="w-16 h-16 rounded-2xl bg-blue-50 border border-blue-100 flex items-center justify-center mx-auto mb-6 text-[#2563EB]">
               <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
               </svg>
             </div>
-            <h3 className="text-xl font-extrabold text-slate-200 mb-2">No Job Postings Yet</h3>
-            <p className="text-slate-400 text-sm max-w-sm mx-auto mb-8">
+            <h3 className="text-xl font-extrabold text-slate-800 mb-2">No Job Postings Yet</h3>
+            <p className="text-slate-500 text-sm max-w-sm mx-auto mb-8">
               Get started by launching your very first open position to attract candidates.
             </p>
             <Link
               href="/recruiter/create-job"
-              className="inline-flex items-center gap-2 px-6 py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl shadow-lg transition"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-[#2563EB] hover:bg-blue-700 text-white font-bold rounded-xl shadow-md transition"
             >
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                 <path fillRule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clipRule="evenodd" />
@@ -272,25 +275,25 @@ export default function RecruiterDashboard() {
             {jobs.map((job) => (
               <div 
                 key={job.id} 
-                className="group relative bg-slate-900/40 border border-slate-900 hover:border-slate-800 rounded-3xl p-6 flex flex-col justify-between transition-all duration-300 hover:shadow-2xl hover:shadow-indigo-950/20 backdrop-blur-xl"
+                className="group relative bg-white border border-slate-100 hover:border-slate-200 rounded-3xl p-6 flex flex-col justify-between transition-all duration-300 hover:shadow-md shadow-sm"
               >
                 {/* Job Info Block */}
                 <div>
                   <div className="flex items-center justify-between gap-3 mb-4">
-                    <span className="px-2.5 py-1 text-xs font-semibold rounded-lg bg-indigo-950/60 border border-indigo-900 text-indigo-300">
+                    <span className="px-2.5 py-1 text-xs font-semibold rounded-lg bg-blue-50 border border-blue-100 text-[#2563EB]">
                       {job.category}
                     </span>
-                    <span className="text-xs text-slate-500 font-medium">
+                    <span className="text-xs text-slate-400 font-medium">
                       {formatDate(job.created_at)}
                     </span>
                   </div>
 
-                  <h2 className="text-xl font-bold text-slate-100 group-hover:text-indigo-400 transition-colors duration-200 truncate">
+                  <h2 className="text-xl font-bold text-slate-800 group-hover:text-[#2563EB] transition-colors duration-200 truncate">
                     {job.title}
                   </h2>
                   
-                  <p className="text-slate-400 font-semibold text-sm mt-1.5 flex items-center gap-1.5">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-slate-500" viewBox="0 0 20 20" fill="currentColor">
+                  <p className="text-slate-500 font-semibold text-sm mt-1.5 flex items-center gap-1.5">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-slate-400" viewBox="0 0 20 20" fill="currentColor">
                       <path fillRule="evenodd" d="M4 4a2 2 0 012-2h8a2 2 0 012 2v12a1 1 0 110 2h-3a1 1 0 01-1-1v-2a1 1 0 00-1-1H9a1 1 0 00-1 1v2a1 1 0 01-1 1H4a1 1 0 110-2V4zm3 1h2v2H7V5zm2 4H7v2h2V9zm2-4h2v2h-2V5zm2 4h-2v2h2V9z" clipRule="evenodd" />
                     </svg>
                     {job.company_name}
@@ -298,15 +301,15 @@ export default function RecruiterDashboard() {
 
                   {/* Metadata Badges */}
                   <div className="flex flex-wrap gap-2.5 mt-5">
-                    <div className="flex items-center gap-1 bg-slate-950/60 border border-slate-850 px-2.5 py-1 rounded-lg text-xs text-slate-350">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5 text-indigo-400" viewBox="0 0 20 20" fill="currentColor">
+                    <div className="flex items-center gap-1 bg-slate-50 border border-slate-100 px-2.5 py-1 rounded-lg text-xs text-slate-600">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5 text-[#2563EB]" viewBox="0 0 20 20" fill="currentColor">
                         <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
                       </svg>
                       {job.location}
                     </div>
 
-                    <div className="flex items-center gap-1 bg-slate-950/60 border border-slate-850 px-2.5 py-1 rounded-lg text-xs text-slate-350">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5 text-purple-400" viewBox="0 0 20 20" fill="currentColor">
+                    <div className="flex items-center gap-1 bg-slate-50 border border-slate-100 px-2.5 py-1 rounded-lg text-xs text-slate-600">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5 text-purple-600" viewBox="0 0 20 20" fill="currentColor">
                         <path fillRule="evenodd" d="M6 6V5a3 3 0 013-3h2a3 3 0 013 3v1h2a2 2 0 012 2v3.57A22.952 22.952 0 0110 13a22.95 22.95 0 01-8-2.43V8a2 2 0 012-2h2zm2-1a1 1 0 011-1h2a1 1 0 011 1v1H8V5zm1 5a1 1 0 100-2 1 1 0 000 2z" clipRule="evenodd" />
                         <path d="M2 13.692V16a2 2 0 002 2h12a2 2 0 002-2v-2.308A24.974 24.974 0 0110 15c-2.796 0-5.487-.46-8-1.308z" />
                       </svg>
@@ -316,22 +319,21 @@ export default function RecruiterDashboard() {
                 </div>
 
                 {/* Dashboard Operations Controls */}
-                <div className="mt-8 pt-4 border-t border-slate-800/60 flex items-center justify-between gap-3">
+                <div className="mt-8 pt-4 border-t border-slate-100 flex items-center justify-between gap-3">
                   <Link
                     href={`/recruiter/edit-job/${job.id}`}
-                    className="flex-1 py-2 px-3 text-center bg-slate-950 hover:bg-slate-900 border border-slate-800 text-slate-300 font-semibold text-xs rounded-xl transition duration-200"
+                    className="flex-1 py-2 px-3 text-center bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 font-semibold text-xs rounded-xl transition duration-200"
                   >
                     Edit Job
                   </Link>
 
                   <button
-                    type="button"
                     disabled={deleteLoadingId === job.id}
                     onClick={() => handleDeleteJob(job.id, job.title)}
-                    className="flex-1 py-2 px-3 bg-rose-950/20 hover:bg-rose-950/60 border border-rose-900 text-rose-350 hover:text-rose-200 font-semibold text-xs rounded-xl transition duration-200 flex items-center justify-center gap-1 active:scale-98 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="flex-1 py-2 px-3 bg-red-50 hover:bg-red-100 border border-red-100 text-red-650 hover:text-red-700 font-semibold text-xs rounded-xl transition duration-200 flex items-center justify-center gap-1 active:scale-98 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {deleteLoadingId === job.id ? (
-                      <svg className="animate-spin h-3.5 w-3.5 text-rose-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <svg className="animate-spin h-3.5 w-3.5 text-red-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                         <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                       </svg>
