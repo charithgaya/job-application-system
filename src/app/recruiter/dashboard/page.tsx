@@ -1,9 +1,352 @@
+"use client";
+
+import React, { useEffect, useState } from "react";
+import Link from "next/link";
+import { supabase } from "@/src/lib/supabase";
+import { User } from "@supabase/supabase-js";
+
+// Define TypeScript Interface for Job items based on database columns
+interface Job {
+  id: string;
+  title: string;
+  description: string;
+  category: string;
+  job_type: string;
+  location: string;
+  salary_range?: string;
+  experience_level: string;
+  requirements: string[];
+  company_name: string;
+  recruiter_id: string;
+  created_at: string;
+}
+
 export default function RecruiterDashboard() {
-    return (
-      <div className="p-10">
-        <h1 className="text-3xl font-bold">
-            Recruiter Dashboard
-        </h1>
+  const [jobs, setJobs] = useState<Job[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState<User | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [deleteLoadingId, setDeleteLoadingId] = useState<string | null>(null);
+  const [statusMessage, setStatusMessage] = useState<{ text: string; type: "success" | "error" } | null>(null);
+
+  useEffect(() => {
+    // 1. Fetch current logged-in user session client-side
+    const checkUserAndFetchJobs = async () => {
+      try {
+        setLoading(true);
+        const { data: { session }, error: authError } = await supabase.auth.getSession();
+        
+        if (authError) throw authError;
+
+        if (!session || !session.user) {
+          setError("You must be logged in as a recruiter to view this dashboard.");
+          setLoading(false);
+          return;
+        }
+
+        setUser(session.user);
+        
+        // 2. Fetch jobs posted only by this recruiter
+        const { data: jobsData, error: jobsError } = await supabase
+          .from("jobs")
+          .select("*")
+          .eq("recruiter_id", session.user.id)
+          .order("created_at", { ascending: false });
+
+        if (jobsError) throw jobsError;
+
+        setJobs(jobsData || []);
+      } catch (err: unknown) {
+        console.error("Dashboard data fetching failed:", err);
+        setError((err as Error).message || "Failed to load dashboard data. Please try again.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    checkUserAndFetchJobs();
+  }, []);
+
+  // 3. Handle Job Deletion
+  const handleDeleteJob = async (jobId: string, jobTitle: string) => {
+    const confirmDelete = window.confirm(`Are you sure you want to delete the job posting for "${jobTitle}"? This action cannot be undone.`);
+    if (!confirmDelete) return;
+
+    try {
+      setDeleteLoadingId(jobId);
+      setStatusMessage(null);
+
+      const { error: deleteError } = await supabase
+        .from("jobs")
+        .delete()
+        .eq("id", jobId);
+
+      if (deleteError) throw deleteError;
+
+      // Filter out the deleted job from state
+      setJobs(jobs.filter(job => job.id !== jobId));
+      setStatusMessage({
+        text: `Job posting for "${jobTitle}" was deleted successfully.`,
+        type: "success"
+      });
+    } catch (err: unknown) {
+      console.error("Failed to delete job posting:", err);
+      setStatusMessage({
+        text: (err as Error).message || "Failed to delete the job posting. Please try again.",
+        type: "error"
+      });
+    } finally {
+      setDeleteLoadingId(null);
+      // Auto-hide alert banner after 4 seconds
+      setTimeout(() => setStatusMessage(null), 4000);
+    }
+  };
+
+  // Helper function to format SQL timestamp to readable date format
+  const formatDate = (dateString: string) => {
+    const options: Intl.DateTimeFormatOptions = { year: "numeric", month: "short", day: "numeric" };
+    return new Date(dateString).toLocaleDateString(undefined, options);
+  };
+
+  // Helper function to render a loading skeleton
+  const renderSkeleton = () => (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {[1, 2, 3].map((n) => (
+        <div key={n} className="bg-slate-900/40 border border-slate-800 rounded-2xl p-6 space-y-4 animate-pulse">
+          <div className="h-6 bg-slate-800 rounded-md w-3/4"></div>
+          <div className="h-4 bg-slate-800 rounded-md w-1/2"></div>
+          <div className="space-y-2 pt-2">
+            <div className="h-3 bg-slate-800 rounded-md w-5/6"></div>
+            <div className="h-3 bg-slate-800 rounded-md w-4/6"></div>
+          </div>
+          <div className="flex gap-2 pt-4">
+            <div className="h-10 bg-slate-800 rounded-xl flex-1"></div>
+            <div className="h-10 bg-slate-800 rounded-xl w-16"></div>
+            <div className="h-10 bg-slate-800 rounded-xl w-16"></div>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+
+  return (
+    <div className="min-h-screen bg-slate-950 text-slate-100 py-12 px-4 sm:px-6 lg:px-8 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-900 via-slate-950 to-slate-950">
+      <div className="max-w-6xl mx-auto">
+        
+        {/* Banner Alert Messages */}
+        {statusMessage && (
+          <div className={`fixed top-5 right-5 z-50 p-4 rounded-xl shadow-2xl border flex items-center gap-3 animate-slide-in max-w-md ${
+            statusMessage.type === "success" 
+              ? "bg-emerald-950/90 border-emerald-800 text-emerald-300" 
+              : "bg-rose-950/90 border-rose-800 text-rose-300"
+          }`}>
+            <span className="text-sm font-semibold">{statusMessage.text}</span>
+            <button
+              aria-label="Close alert"
+              type="button"
+              onClick={() => setStatusMessage(null)} className="text-slate-400 hover:text-slate-200">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+        )}
+
+        {/* Dashboard Header */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 mb-10 pb-6 border-b border-slate-800/80">
+          <div>
+            <h1 className="text-3xl font-extrabold tracking-tight bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
+              Recruiter Dashboard
+            </h1>
+            <p className="mt-2 text-slate-400 text-sm sm:text-base">
+              {user ? `Logged in as: ${user.email}` : "Manage and track your active job opportunities."}
+            </p>
+          </div>
+
+          <div>
+            <Link
+              href="/recruiter/create-job"
+              className="inline-flex items-center gap-2 px-5 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-bold rounded-xl shadow-lg shadow-indigo-950/30 transition-all hover:-translate-y-0.5 active:translate-y-0 text-sm active:scale-98"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clipRule="evenodd" />
+              </svg>
+              Create New Job
+            </Link>
+          </div>
+        </div>
+
+        {/* Statistics Cards Row */}
+        {!error && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-10">
+            {loading ? (
+              // Loading Stats Skeleton
+              [1, 2].map((n) => (
+                <div key={n} className="bg-slate-900/40 border border-slate-900 rounded-3xl p-6 flex items-center justify-between animate-pulse">
+                  <div className="space-y-2.5 flex-1">
+                    <div className="h-4 bg-slate-800 rounded w-1/3"></div>
+                    <div className="h-8 bg-slate-800 rounded w-1/4"></div>
+                    <div className="h-3 bg-slate-800 rounded w-1/2"></div>
+                  </div>
+                  <div className="h-14 w-14 bg-slate-800 rounded-2xl"></div>
+                </div>
+              ))
+            ) : (
+              <>
+                {/* Total Jobs Posted */}
+                <div className="bg-slate-900/40 border border-slate-900 rounded-3xl p-6 flex items-center justify-between backdrop-blur-xl hover:border-slate-800 transition duration-300">
+                  <div>
+                    <p className="text-sm font-medium text-slate-400">Total Jobs Posted</p>
+                    <h3 className="text-3xl font-extrabold text-slate-100 mt-1.5">{jobs.length}</h3>
+                    <p className="text-xs text-indigo-400/80 mt-1">Opportunities published</p>
+                  </div>
+                  <div className="p-4 bg-indigo-950/40 border border-indigo-900/60 rounded-2xl text-indigo-400">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V5a3 3 0 00-3-3h-2a3 3 0 00-3 3v1m8 0H6m9 0H9m1.8 13.2h2.4M12 15V3" />
+                    </svg>
+                  </div>
+                </div>
+
+                {/* Most Recent Job Date */}
+                <div className="bg-slate-900/40 border border-slate-900 rounded-3xl p-6 flex items-center justify-between backdrop-blur-xl hover:border-slate-800 transition duration-300">
+                  <div>
+                    <p className="text-sm font-medium text-slate-400">Most Recent Post</p>
+                    <h3 className="text-2xl font-bold text-slate-100 mt-1.5">
+                      {jobs.length > 0 ? formatDate(jobs[0].created_at) : "No listings yet"}
+                    </h3>
+                    <p className="text-xs text-purple-400/80 mt-1.5">Last activity date</p>
+                  </div>
+                  <div className="p-4 bg-purple-950/40 border border-purple-900/60 rounded-2xl text-purple-400">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
+        )}
+
+        {/* Main Interface Content */}
+        {error ? (
+          <div className="p-8 rounded-2xl bg-slate-900/40 border border-slate-850 text-center max-w-xl mx-auto">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-rose-500 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+            <h3 className="text-lg font-bold text-slate-200 mb-2">Access Restrained</h3>
+            <p className="text-slate-400 text-sm mb-6">{error}</p>
+            <Link 
+              href="/recruiter/login" 
+              className="inline-block px-6 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold rounded-xl text-sm transition"
+            >
+              Go to Login
+            </Link>
+          </div>
+        ) : loading ? (
+          renderSkeleton()
+        ) : jobs.length === 0 ? (
+          /* Empty State View */
+          <div className="p-12 text-center rounded-3xl bg-slate-900/20 border border-slate-900 backdrop-blur-xl max-w-2xl mx-auto py-16">
+            <div className="w-16 h-16 rounded-2xl bg-indigo-950/40 border border-indigo-900 flex items-center justify-center mx-auto mb-6 text-indigo-400">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+              </svg>
+            </div>
+            <h3 className="text-xl font-extrabold text-slate-200 mb-2">No Job Postings Yet</h3>
+            <p className="text-slate-400 text-sm max-w-sm mx-auto mb-8">
+              Get started by launching your very first open position to attract candidates.
+            </p>
+            <Link
+              href="/recruiter/create-job"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl shadow-lg transition"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clipRule="evenodd" />
+              </svg>
+              Publish First Job
+            </Link>
+          </div>
+        ) : (
+          /* Active Jobs Card Grid */
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {jobs.map((job) => (
+              <div 
+                key={job.id} 
+                className="group relative bg-slate-900/40 border border-slate-900 hover:border-slate-800 rounded-3xl p-6 flex flex-col justify-between transition-all duration-300 hover:shadow-2xl hover:shadow-indigo-950/20 backdrop-blur-xl"
+              >
+                {/* Job Info Block */}
+                <div>
+                  <div className="flex items-center justify-between gap-3 mb-4">
+                    <span className="px-2.5 py-1 text-xs font-semibold rounded-lg bg-indigo-950/60 border border-indigo-900 text-indigo-300">
+                      {job.category}
+                    </span>
+                    <span className="text-xs text-slate-500 font-medium">
+                      {formatDate(job.created_at)}
+                    </span>
+                  </div>
+
+                  <h2 className="text-xl font-bold text-slate-100 group-hover:text-indigo-400 transition-colors duration-200 truncate">
+                    {job.title}
+                  </h2>
+                  
+                  <p className="text-slate-400 font-semibold text-sm mt-1.5 flex items-center gap-1.5">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-slate-500" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M4 4a2 2 0 012-2h8a2 2 0 012 2v12a1 1 0 110 2h-3a1 1 0 01-1-1v-2a1 1 0 00-1-1H9a1 1 0 00-1 1v2a1 1 0 01-1 1H4a1 1 0 110-2V4zm3 1h2v2H7V5zm2 4H7v2h2V9zm2-4h2v2h-2V5zm2 4h-2v2h2V9z" clipRule="evenodd" />
+                    </svg>
+                    {job.company_name}
+                  </p>
+
+                  {/* Metadata Badges */}
+                  <div className="flex flex-wrap gap-2.5 mt-5">
+                    <div className="flex items-center gap-1 bg-slate-950/60 border border-slate-850 px-2.5 py-1 rounded-lg text-xs text-slate-350">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5 text-indigo-400" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
+                      </svg>
+                      {job.location}
+                    </div>
+
+                    <div className="flex items-center gap-1 bg-slate-950/60 border border-slate-850 px-2.5 py-1 rounded-lg text-xs text-slate-350">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5 text-purple-400" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M6 6V5a3 3 0 013-3h2a3 3 0 013 3v1h2a2 2 0 012 2v3.57A22.952 22.952 0 0110 13a22.95 22.95 0 01-8-2.43V8a2 2 0 012-2h2zm2-1a1 1 0 011-1h2a1 1 0 011 1v1H8V5zm1 5a1 1 0 100-2 1 1 0 000 2z" clipRule="evenodd" />
+                        <path d="M2 13.692V16a2 2 0 002 2h12a2 2 0 002-2v-2.308A24.974 24.974 0 0110 15c-2.796 0-5.487-.46-8-1.308z" />
+                      </svg>
+                      {job.job_type}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Dashboard Operations Controls */}
+                <div className="mt-8 pt-4 border-t border-slate-800/60 flex items-center justify-between gap-3">
+                  <Link
+                    href={`/recruiter/edit-job/${job.id}`}
+                    className="flex-1 py-2 px-3 text-center bg-slate-950 hover:bg-slate-900 border border-slate-800 text-slate-300 font-semibold text-xs rounded-xl transition duration-200"
+                  >
+                    Edit Job
+                  </Link>
+
+                  <button
+                    type="button"
+                    disabled={deleteLoadingId === job.id}
+                    onClick={() => handleDeleteJob(job.id, job.title)}
+                    className="flex-1 py-2 px-3 bg-rose-950/20 hover:bg-rose-950/60 border border-rose-900 text-rose-350 hover:text-rose-200 font-semibold text-xs rounded-xl transition duration-200 flex items-center justify-center gap-1 active:scale-98 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {deleteLoadingId === job.id ? (
+                      <svg className="animate-spin h-3.5 w-3.5 text-rose-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                    ) : (
+                      "Delete"
+                    )}
+                  </button>
+                </div>
+
+              </div>
+            ))}
+          </div>
+        )}
+
       </div>
-    );
+    </div>
+  );
 }
