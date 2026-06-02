@@ -104,27 +104,41 @@ export default function CreateJobPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-900 text-slate-100 py-12 px-4 sm:px-6 lg:px-8 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-slate-900 via-purple-950/20 to-slate-950">
+    <div className="min-h-screen bg-[#F8FAFC] text-slate-800 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-3xl mx-auto">
+        
+        {/* Navigation Breadcrumb */}
+        <div className="mb-6">
+          <button
+            onClick={() => router.push("/recruiter/dashboard")}
+            className="inline-flex items-center gap-2 text-sm font-semibold text-[#2563EB] hover:text-blue-700 transition"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            Back to Dashboard
+          </button>
+        </div>
+
         {/* Header Section */}
         <div className="text-center mb-10">
-          <h1 className="text-4xl font-extrabold tracking-tight bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
+          <h1 className="text-4xl font-extrabold tracking-tight text-[#1E293B]">
             Post a New Opportunity
           </h1>
-          <p className="mt-3 text-lg text-slate-400">
+          <p className="mt-3 text-lg text-slate-500">
             Publish your job role to find outstanding candidates across our platform.
           </p>
         </div>
 
         {/* Form Container */}
-        <div className="bg-slate-900/60 backdrop-blur-xl border border-slate-800 rounded-3xl p-8 shadow-2xl relative overflow-hidden">
-          {/* Accent decoration */}
-          <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500" />
+        <div className="bg-white border border-slate-100 rounded-3xl p-8 shadow-sm relative overflow-hidden">
+          {/* Accent decoration (Trust Blue) */}
+          <div className="absolute top-0 left-0 right-0 h-1.5 bg-[#2563EB]" />
 
           {/* Status Alert Panels */}
           {error && (
-            <div className="mb-6 p-4 rounded-xl bg-red-950/40 border border-red-800 text-red-300 text-sm flex items-start gap-3 animate-fade-in">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 shrink-0 mt-0.5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+            <div className="mb-6 p-4 rounded-xl bg-red-50 border border-red-200 text-red-700 text-sm flex items-start gap-3 animate-fade-in">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 shrink-0 mt-0.5 text-red-500" viewBox="0 0 20 20" fill="currentColor">
                 <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
               </svg>
               <span>{error}</span>
@@ -132,8 +146,8 @@ export default function CreateJobPage() {
           )}
 
           {success && (
-            <div className="mb-6 p-4 rounded-xl bg-emerald-950/40 border border-emerald-800 text-emerald-300 text-sm flex items-start gap-3 animate-fade-in">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 shrink-0 mt-0.5 text-emerald-400" viewBox="0 0 20 20" fill="currentColor">
+            <div className="mb-6 p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 text-sm flex items-start gap-3 animate-fade-in">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 shrink-0 mt-0.5 text-emerald-500" viewBox="0 0 20 20" fill="currentColor">
                 <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
               </svg>
               <span>{success} Redirecting to your dashboard...</span>
@@ -141,16 +155,17 @@ export default function CreateJobPage() {
           )}
 
           <form onSubmit={handleSubmit} className="space-y-8">
+            
             {/* Section 1: Basic Information */}
             <div>
-              <h2 className="text-xl font-bold text-indigo-300 mb-5 pb-2 border-b border-slate-800/80">
+              <h2 className="text-xl font-bold text-[#1E293B] mb-5 pb-2 border-b border-slate-100">
                 Role Overview
               </h2>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label htmlFor="title" className="block text-sm font-semibold text-slate-300 mb-2">
-                    Job Title <span className="text-rose-400">*</span>
+                  <label htmlFor="title" className="block text-sm font-semibold text-slate-700 mb-2">
+                    Job Title <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
@@ -159,13 +174,13 @@ export default function CreateJobPage() {
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
                     placeholder="e.g., Senior Full-Stack Engineer"
-                    className="w-full bg-slate-950/70 border border-slate-800 rounded-xl px-4 py-3 text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition duration-200"
+                    className="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-[#2563EB] transition duration-200"
                   />
                 </div>
 
                 <div>
-                  <label htmlFor="companyName" className="block text-sm font-semibold text-slate-300 mb-2">
-                    Company Name <span className="text-rose-400">*</span>
+                  <label htmlFor="companyName" className="block text-sm font-semibold text-slate-700 mb-2">
+                    Company Name <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
@@ -174,22 +189,22 @@ export default function CreateJobPage() {
                     value={companyName}
                     onChange={(e) => setCompanyName(e.target.value)}
                     placeholder="e.g., Acme Technologies"
-                    className="w-full bg-slate-950/70 border border-slate-800 rounded-xl px-4 py-3 text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition duration-200"
+                    className="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-[#2563EB] transition duration-200"
                   />
                 </div>
 
                 <div>
-                  <label htmlFor="category" className="block text-sm font-semibold text-slate-300 mb-2">
-                    Category <span className="text-rose-400">*</span>
+                  <label htmlFor="category" className="block text-sm font-semibold text-slate-700 mb-2">
+                    Category <span className="text-red-500">*</span>
                   </label>
                   <select
                     id="category"
                     required
                     value={category}
                     onChange={(e) => setCategory(e.target.value)}
-                    className="w-full bg-slate-950/70 border border-slate-800 rounded-xl px-4 py-3 text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition duration-200 appearance-none"
+                    className="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-[#2563EB] transition duration-200 cursor-pointer"
                   >
-                    <option value="" disabled className="text-slate-500">
+                    <option value="" disabled className="text-slate-450">
                       Select a category
                     </option>
                     {CATEGORIES.map((cat) => (
@@ -201,15 +216,15 @@ export default function CreateJobPage() {
                 </div>
 
                 <div>
-                  <label htmlFor="experienceLevel" className="block text-sm font-semibold text-slate-300 mb-2">
-                    Experience Level <span className="text-rose-400">*</span>
+                  <label htmlFor="experienceLevel" className="block text-sm font-semibold text-slate-700 mb-2">
+                    Experience Level <span className="text-red-500">*</span>
                   </label>
                   <select
                     id="experienceLevel"
                     required
                     value={experienceLevel}
                     onChange={(e) => setExperienceLevel(e.target.value as typeof EXPERIENCE_LEVELS[number])}
-                    className="w-full bg-slate-950/70 border border-slate-800 rounded-xl px-4 py-3 text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition duration-200"
+                    className="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-[#2563EB] transition duration-200 cursor-pointer"
                   >
                     {EXPERIENCE_LEVELS.map((level) => (
                       <option key={level} value={level}>
@@ -223,21 +238,21 @@ export default function CreateJobPage() {
 
             {/* Section 2: Compensation & Logistics */}
             <div>
-              <h2 className="text-xl font-bold text-indigo-300 mb-5 pb-2 border-b border-slate-800/80">
+              <h2 className="text-xl font-bold text-[#1E293B] mb-5 pb-2 border-b border-slate-100">
                 Logistics & Budget
               </h2>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div>
-                  <label htmlFor="jobType" className="block text-sm font-semibold text-slate-300 mb-2">
-                    Job Type <span className="text-rose-400">*</span>
+                  <label htmlFor="jobType" className="block text-sm font-semibold text-slate-700 mb-2">
+                    Job Type <span className="text-red-500">*</span>
                   </label>
                   <select
                     id="jobType"
                     required
                     value={jobType}
                     onChange={(e) => setJobType(e.target.value as typeof JOB_TYPES[number])}
-                    className="w-full bg-slate-950/70 border border-slate-800 rounded-xl px-4 py-3 text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition duration-200"
+                    className="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-[#2563EB] transition duration-200 cursor-pointer"
                   >
                     {JOB_TYPES.map((type) => (
                       <option key={type} value={type}>
@@ -248,8 +263,8 @@ export default function CreateJobPage() {
                 </div>
 
                 <div>
-                  <label htmlFor="location" className="block text-sm font-semibold text-slate-300 mb-2">
-                    Location <span className="text-rose-400">*</span>
+                  <label htmlFor="location" className="block text-sm font-semibold text-slate-700 mb-2">
+                    Location <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
@@ -258,13 +273,13 @@ export default function CreateJobPage() {
                     value={location}
                     onChange={(e) => setLocation(e.target.value)}
                     placeholder="e.g., Remote / New York, NY"
-                    className="w-full bg-slate-950/70 border border-slate-800 rounded-xl px-4 py-3 text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition duration-200"
+                    className="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-[#2563EB] transition duration-200"
                   />
                 </div>
 
                 <div>
-                  <label htmlFor="salaryRange" className="block text-sm font-semibold text-slate-300 mb-2">
-                    Salary Range <span className="text-slate-500">(Optional)</span>
+                  <label htmlFor="salaryRange" className="block text-sm font-semibold text-slate-700 mb-2">
+                    Salary Range <span className="text-slate-400">(Optional)</span>
                   </label>
                   <input
                     type="text"
@@ -272,7 +287,7 @@ export default function CreateJobPage() {
                     value={salaryRange}
                     onChange={(e) => setSalaryRange(e.target.value)}
                     placeholder="e.g., $110,000 - $140,000 / yr"
-                    className="w-full bg-slate-950/70 border border-slate-800 rounded-xl px-4 py-3 text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition duration-200"
+                    className="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-[#2563EB] transition duration-200"
                   />
                 </div>
               </div>
@@ -280,12 +295,12 @@ export default function CreateJobPage() {
 
             {/* Section 3: Job Description */}
             <div>
-              <h2 className="text-xl font-bold text-indigo-300 mb-5 pb-2 border-b border-slate-800/80">
+              <h2 className="text-xl font-bold text-[#1E293B] mb-5 pb-2 border-b border-slate-100">
                 Detailed Description
               </h2>
               <div>
-                <label htmlFor="description" className="block text-sm font-semibold text-slate-300 mb-2">
-                  Role Details & Expectations <span className="text-rose-400">*</span>
+                <label htmlFor="description" className="block text-sm font-semibold text-slate-700 mb-2">
+                  Role Details & Expectations <span className="text-red-500">*</span>
                 </label>
                 <textarea
                   id="description"
@@ -294,20 +309,20 @@ export default function CreateJobPage() {
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   placeholder="Provide an overview of the role, daily responsibilities, ideal candidate mindset, company work environment, and benefits..."
-                  className="w-full bg-slate-950/70 border border-slate-800 rounded-xl px-4 py-3 text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition duration-200 resize-y"
+                  className="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-[#2563EB] transition duration-200 resize-y"
                 />
               </div>
             </div>
 
             {/* Section 4: Dynamic Requirements Tag Input */}
             <div>
-              <h2 className="text-xl font-bold text-indigo-300 mb-5 pb-2 border-b border-slate-800/80">
+              <h2 className="text-xl font-bold text-[#1E293B] mb-5 pb-2 border-b border-slate-100">
                 Requirements Checklist
               </h2>
               
               <div className="space-y-4">
-                <label className="block text-sm font-semibold text-slate-300">
-                  Key Skills & Qualifications <span className="text-rose-400">*</span>
+                <label className="block text-sm font-semibold text-slate-700">
+                  Key Skills & Qualifications <span className="text-red-500">*</span>
                 </label>
                 
                 <div className="flex gap-2">
@@ -316,12 +331,12 @@ export default function CreateJobPage() {
                     value={newRequirement}
                     onChange={(e) => setNewRequirement(e.target.value)}
                     placeholder="Add a key skill (e.g., '3+ years with Next.js & TypeScript')"
-                    className="flex-1 bg-slate-950/70 border border-slate-800 rounded-xl px-4 py-3 text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition duration-200"
+                    className="flex-1 bg-slate-50/50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-[#2563EB] transition duration-200"
                   />
                   <button
                     type="button"
                     onClick={handleAddRequirement}
-                    className="px-5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl transition duration-200 flex items-center justify-center gap-1 active:scale-95"
+                    className="px-5 bg-[#2563EB] hover:bg-blue-700 text-white font-bold rounded-xl transition duration-200 flex items-center justify-center gap-1 active:scale-95"
                   >
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                       <path fillRule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clipRule="evenodd" />
@@ -330,9 +345,8 @@ export default function CreateJobPage() {
                   </button>
                 </div>
 
-                {/* Display added items */}
                 {requirements.length === 0 ? (
-                  <p className="text-xs text-slate-500 italic mt-2">
+                  <p className="text-xs text-slate-450 italic mt-2">
                     No requirements added yet. Please add at least one key requirement above.
                   </p>
                 ) : (
@@ -340,14 +354,14 @@ export default function CreateJobPage() {
                     {requirements.map((req, idx) => (
                       <div
                         key={idx}
-                        className="flex items-center gap-2 bg-indigo-950/40 border border-indigo-800 text-indigo-200 px-3 py-1.5 rounded-lg text-sm select-none"
+                        className="flex items-center gap-2 bg-blue-50 border border-blue-100 text-[#2563EB] px-3 py-1.5 rounded-lg text-sm select-none"
                       >
                         <span className="truncate max-w-xs">{req}</span>
                         <button
-                          title="Remove Requirement"
+                          aria-label="Remove requirement"
                           type="button"
                           onClick={() => handleRemoveRequirement(idx)}
-                          className="text-indigo-400 hover:text-rose-400 transition"
+                          className="text-blue-400 hover:text-red-500 transition"
                         >
                           <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -360,12 +374,12 @@ export default function CreateJobPage() {
               </div>
             </div>
 
-            {/* Submit Button */}
+            {/* Submit Button (Action Orange) */}
             <div className="pt-6">
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-4 px-6 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 hover:from-indigo-500 hover:via-purple-500 hover:to-pink-500 text-white font-extrabold text-lg rounded-2xl transition duration-300 shadow-xl shadow-purple-950/20 active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                className="w-full py-4 px-6 bg-[#F97316] hover:bg-orange-600 text-white font-extrabold text-lg rounded-2xl transition duration-300 shadow-md shadow-orange-500/10 active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
                 {loading ? (
                   <>
