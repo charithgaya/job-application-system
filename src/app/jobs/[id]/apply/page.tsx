@@ -81,7 +81,7 @@ export default function ApplyJobPage () {
             setMessage("Application submitted successfully!");
 
             setTimeout(() => {
-                router.push("/candidate");
+                router.push("/candidate/dashboard");
             }, 1500);
 
         } catch (error) {
