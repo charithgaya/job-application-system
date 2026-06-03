@@ -93,3 +93,33 @@ export async function createJobAction(formData: JobInput) {
     };
   }
 }
+
+export async function updateJobAction(jobId: string, payload: JobInput) {
+  
+    const { error } = await supabase
+      .from("jobs")
+      .update({
+        title: payload.title,
+        description: payload.description,
+        category: payload.category,
+        job_type: payload.jobType,
+        location: payload.location,
+        salary_range: payload.salaryRange,
+        experience_level: payload.experienceLevel,
+        requirements: payload.requirements,
+        company_name: payload.companyName,
+      })
+      .eq("id", jobId);
+
+      if (error){
+        return {
+          success: false,
+          error: error.message || "Failed to update job in database.",
+        };
+      }
+      
+      return {
+        success: true,
+        message: "Job posting updated successfully!",
+        };
+}
