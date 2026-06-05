@@ -64,11 +64,11 @@ export default function LoginPage() {
 
       // 3. Dynamic role-based redirects using Next.js App Router
       if (profile.role === "candidate") {
-        router.push("/candidate");
+        router.push("/candidate/dashboard");
       } else if (profile.role === "recruiter") {
-        router.push("/recruiter");
+        router.push("/recruiter/dashboard");
       } else if (profile.role === "admin") {
-        router.push("/admin");
+        router.push("/admin/dashboard");
       } else {
         setErrorMessage(`Invalid profile role detected: ${profile.role}`);
       }

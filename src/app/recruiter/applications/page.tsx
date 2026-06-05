@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { supabase } from "@/src/lib/supabase";
 
 interface Application {
@@ -22,40 +22,36 @@ interface Application {
 
 export default function ApplicationsPage() {
     const [applications, setApplications] = useState<Application[]>([]);
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(false);
 
-    if (loading) {
-        return (
-            <div className="p-6">
-                Loading applications...
-            </div>
-        );
-    }
-
-    const fetchApplications = async () => {
+    async function fetchApplications () {
         setLoading(true);
         const {
             data: { user },
         } = await supabase.auth.getUser();
 
-        if (!user) return;
+        if (!user) {
+            setLoading(false);
+            return;
+        }
 
         const { data, error } = await supabase
             .from("applications")
             .select(`
                 *, 
                 jobs (
-                    id, title, company_name, recruiter_id
+                    id,
+                    title, 
+                    company_name, 
+                    recruiter_id
                 ),
                 profiles!applications_candidate_id_fkey (
-                    full_name, email
+                    full_name, 
+                    email
                 )
             `);
 
-        if (error) {
-            console.error("Error fetching applications:", error);
-            return;
-        }
+        if (error) throw error;
 
         const recruiterApplications = data?.filter(
             (app) => app.jobs?.recruiter_id === user.id
@@ -64,6 +60,11 @@ export default function ApplicationsPage() {
         setApplications(recruiterApplications);
         setLoading(false);
     };
+
+    useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        fetchApplications();
+    }, []);
 
     const acceptApplication = async (id: string) => {
         const { error } = await supabase
@@ -87,29 +88,37 @@ export default function ApplicationsPage() {
         }
     };
 
+    if (loading) {
+        return (
+            <div className="p-6">
+                Loading applications...
+            </div>
+        );
+    }
+
     return (
-        <div className="bg-white rounded-xl shadow p-6">
+        <div className="rounded-xl shadow p-6">
 
             <h2 className="text-xl font-bold mb-4">
                 Applications Received
             </h2>
 
-            <table className="w-full">
+            <table className="table-auto w-full">
                 <thead>
                     <tr>
-                        <th>Job</th>
-                        <th>Candidate</th>
-                        <th>Status</th>
-                        <th>Action</th>
+                        <th className="px-4 py-2">Job</th>
+                        <th className="px-4 py-2">Candidate</th>
+                        <th className="px-4 py-2">Status</th>
+                        <th className="px-4 py-2">Action</th>
                     </tr>
                 </thead>
 
                 <tbody>
                     {applications.map((app) => (
                         <tr key={app.id}>
-                            <td>{app.jobs?.title}</td>
-                            <td>{app.profiles?.full_name || "Unknown"}</td>
-                            <td>
+                            <td className="border px-4 py-2">{app.jobs?.title}</td>
+                            <td className="border px-4 py-2 text-center">{app.profiles?.full_name || "Unknown"}</td>
+                            <td className="border px-4 py-2 text-center">
                                 <span
                                     className={`px-2 py-1 rounded ${
                                         app.status === "pending"
@@ -123,23 +132,26 @@ export default function ApplicationsPage() {
                                 </span>
                             </td>
 
-                            <td>
+                            <td className="border px-4 py-2">
                                 {app.status === "pending" && (
                                 <>
-                                    <button
-                                        type="button"
-                                        onClick={() => acceptApplication(app.id)} 
-                                        className="bg-green-500 text-white px-3 py-1 rounded"
-                                    >
-                                        Accept
-                                    </button>
-                                    <button 
-                                        type="button"
-                                        onClick={() => rejectApplication(app.id)}
-                                        className="bg-red-500 text-white px-3 py-1 rounded"
-                                    >
-                                        Reject
-                                    </button>
+                                    <div className="flex items-center justify-center">
+                                        <button
+                                            type="button"
+                                            onClick={() => acceptApplication(app.id)} 
+                                            className="bg-green-500 text-white px-3 py-1 rounded m-2"
+                                        >
+                                            Accept
+                                        </button>
+
+                                        <button 
+                                            type="button"
+                                            onClick={() => rejectApplication(app.id)}
+                                            className="bg-red-500 text-white px-3 py-1 rounded m-2"
+                                        >
+                                            Reject
+                                        </button>
+                                    </div>
                                 </>
                                 )}
 
