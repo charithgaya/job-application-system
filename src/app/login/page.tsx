@@ -68,10 +68,14 @@ export default function LoginPage() {
       } else if (profile.role === "recruiter") {
         router.push("/recruiter/dashboard");
       } else if (profile.role === "admin") {
+        console.log("Redirecting admin...");
         router.push("/admin/dashboard");
       } else {
         setErrorMessage(`Invalid profile role detected: ${profile.role}`);
       }
+
+      console.log("Profile:", profile);
+      console.log("Role:", profile?.role);
     } catch (err: unknown) {
       console.error("Login process error:", err);
       setErrorMessage((err as Error).message || "An unexpected error occurred during login.");
