@@ -119,6 +119,15 @@ export default async function AdminDashboardPage() {
   return (
     <div className="space-y-8">
       <div>
+        <div className="flex items-center gap-1">
+          <Link href="/profile">
+            <img
+              src="/default_avatar.png"
+              alt="Profile"
+              className="w-20 h-20 rounded-full"
+            />
+          </Link> 
+        </div>
         <h1 className="text-2xl font-bold text-[#1E293B]">Admin Dashboard</h1>
         <p className="mt-1 text-sm text-slate-500">
           Monitor users, jobs, and applications across the platform.

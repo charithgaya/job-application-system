@@ -171,6 +171,16 @@ export default function RecruiterDashboard() {
           <div className="flex items-center justify-between mb-6">
 
             <div>
+              <div className="flex items-center gap-1">
+                <Link href="/profile">
+                  <img
+                    src="/default_avatar.png"
+                    alt="Profile"
+                    className="w-20 h-20 rounded-full"
+                />
+                </Link> 
+              </div>
+              
               <h1 className="text-3xl font-extrabold tracking-tight text-[#1E293B]">
                 Recruiter Dashboard
               </h1>

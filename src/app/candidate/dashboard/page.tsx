@@ -147,6 +147,15 @@ export default function CandidateDashboard() {
       <div className="min-h-screen bg-slate-50 p-8">
         <div className="max-w-6xl mx-auto">
           <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center gap-1">
+                <Link href="/profile">
+                  <img
+                    src="/default_avatar.png"
+                    alt="Profile"
+                    className="w-20 h-20 rounded-full"
+                />
+                </Link> 
+            </div>
             <div>
               <h1 className="text-3xl font-extrabold tracking-tight text-[#1E293B]">
                 Candidate Dashboard
