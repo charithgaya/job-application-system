@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { supabase } from "@/src/lib/supabase";
 import { User } from "@supabase/supabase-js";
+import { useRouter } from "next/navigation";
 
 // Define TypeScript Interface for Job items based on database columns
 interface Job {
@@ -28,6 +29,16 @@ export default function RecruiterDashboard() {
   const [error, setError] = useState<string | null>(null);
   const [deleteLoadingId, setDeleteLoadingId] = useState<string | null>(null);
   const [statusMessage, setStatusMessage] = useState<{ text: string; type: "success" | "error" } | null>(null);
+
+  const router = useRouter();
+
+  const handleLogout = async () => {
+    const { error } = await supabase.auth.signOut();
+
+    if (!error) {
+      router.push("/login");
+    }
+  };
 
   useEffect(() => {
     // 1. Fetch current logged-in user session client-side
@@ -157,13 +168,25 @@ export default function RecruiterDashboard() {
 
         {/* Dashboard Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 mb-10 pb-6 border-b border-slate-100">
-          <div>
-            <h1 className="text-3xl font-extrabold tracking-tight text-[#1E293B]">
-              Recruiter Dashboard
-            </h1>
-            <p className="mt-2 text-slate-500 text-sm sm:text-base">
-              {user ? `Logged in as: ${user.email}` : "Manage and track your active job opportunities."}
+          <div className="flex items-center justify-between mb-6">
+
+            <div>
+              <h1 className="text-3xl font-extrabold tracking-tight text-[#1E293B]">
+                Recruiter Dashboard
+              </h1>
+              <p className="mt-2 text-slate-500 text-sm sm:text-base">
+                {user ? `Logged in as: ${user.email}` : "Manage and track your active job opportunities."}
             </p>
+            </div>
+
+             <button
+              type="button"
+              onClick={handleLogout}
+              className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition"
+            >
+              Logout
+            </button>
+
           </div>
 
           <div>
@@ -176,6 +199,17 @@ export default function RecruiterDashboard() {
               </svg>
               Create New Job
             </Link>
+            
+            <Link
+              href="/recruiter/applications"
+              className="inline-flex items-center gap-2 px-5 py-3 bg-[#2563EB] hover:bg-blue-700 text-white font-bold rounded-xl shadow-md shadow-blue-500/10 transition-all hover:-translate-y-0.5 active:translate-y-0 text-sm active:scale-98 m-3"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+              View Applications
+            </Link>
+          
           </div>
         </div>
 
