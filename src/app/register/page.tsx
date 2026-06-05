@@ -7,6 +7,8 @@ import { supabase } from "@/src/lib/supabase";
 
 export default function RegisterPage() {
   const router = useRouter();
+  const [fullName, setFullName] = useState("");
+  const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [role, setRole] = useState("candidate");
@@ -53,7 +55,8 @@ export default function RegisterPage() {
           id: user.id,
           email,
           role,
-          full_name: "",
+          full_name: fullName,
+          phone,
         });
 
         if (profileError) {
@@ -132,7 +135,23 @@ export default function RegisterPage() {
 
         {/* Form Fields */}
         <form onSubmit={handleRegister} className="space-y-6">
-          
+
+          {/* Full Name */}
+          <div>
+            <label htmlFor="fullName" className="block text-sm font-semibold text-slate-700 mb-2">
+              Full Name
+            </label>
+            <input
+              type="text"
+              id="fullName"
+              required
+              placeholder="John Doe"
+              value={fullName}
+              onChange={(e) => setFullName(e.target.value)}
+              className="w-full bg-slate-50/50 border border-slate-200 rounded-2xl px-4 py-3.5 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-[#2563EB] transition duration-200"
+            />
+          </div>
+
           {/* Email Address */}
           <div>
             <label htmlFor="email" className="block text-sm font-semibold text-slate-700 mb-2">
@@ -145,6 +164,21 @@ export default function RegisterPage() {
               placeholder="name@company.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              className="w-full bg-slate-50/50 border border-slate-200 rounded-2xl px-4 py-3.5 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-[#2563EB] transition duration-200"
+            />
+          </div>
+
+          {/* Phone Number (Optional) */}
+          <div>
+            <label htmlFor="phone" className="block text-sm font-semibold text-slate-700 mb-2">
+              Phone Number
+            </label>
+            <input
+              type="tel"
+              id="phone"
+              placeholder="071-234 5678 (optional)"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
               className="w-full bg-slate-50/50 border border-slate-200 rounded-2xl px-4 py-3.5 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-[#2563EB] transition duration-200"
             />
           </div>
@@ -227,6 +261,7 @@ export default function RegisterPage() {
           <Link href="/login" className="font-semibold text-[#2563EB] hover:text-blue-700 transition">
             Sign In
           </Link>
+          {" "} now.
         </div>
 
       </div>

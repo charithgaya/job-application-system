@@ -162,7 +162,7 @@ export default function LoginPage() {
             </div>
             <div className="relative w-full">
             <input
-              type="password"
+              type={showPassword ? "text" : "password"}
               id="password"
               required
               placeholder="••••••••"
@@ -212,6 +212,14 @@ export default function LoginPage() {
             </button>
           </div>
         </form>
+
+        {/* Toggle Sign Up Link */}
+        <div className="mt-8 text-center text-sm text-slate-500">
+          Don&apos;t have an account?{" "}
+          <Link href="/register" className="font-semibold text-[#2563EB] hover:text-blue-700 transition">
+            Sign Up
+          </Link>
+        </div>
 
         {/* Footer Details */}
         <div className="mt-8 text-center text-xs text-slate-400">
