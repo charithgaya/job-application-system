@@ -167,61 +167,62 @@ export default function RecruiterDashboard() {
         )}
 
         {/* Dashboard Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 mb-10 pb-6 border-b border-slate-100">
-          <div className="flex items-center justify-between mb-6">
-
-            <div>
-              <div className="flex items-center gap-1">
-                <Link href="/profile">
-                  <img
-                    src="/default_avatar.png"
-                    alt="Profile"
-                    className="w-20 h-20 rounded-full"
+        <div className="mb-10 border-b border-slate-100 pb-6">
+          <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+            <div className="flex items-start gap-4">
+              <Link href="/profile">
+                <img
+                  src="/default_avatar.png"
+                  alt="Profile"
+                  className="h-16 w-16 rounded-full border border-slate-200 object-cover shadow-sm"
                 />
-                </Link> 
+              </Link>
+
+              <div>
+                <h1 className="text-3xl font-extrabold tracking-tight text-[#1E293B]">
+                  Recruiter Dashboard
+                </h1>
+                <p className="mt-2 text-sm text-slate-500 sm:text-base">
+                  {user
+                    ? `Logged in as: ${user.email}`
+                    : "Manage and track your active job opportunities."}
+                </p>
               </div>
-              
-              <h1 className="text-3xl font-extrabold tracking-tight text-[#1E293B]">
-                Recruiter Dashboard
-              </h1>
-              <p className="mt-2 text-slate-500 text-sm sm:text-base">
-                {user ? `Logged in as: ${user.email}` : "Manage and track your active job opportunities."}
-            </p>
+              <button
+                type="button"
+                onClick={handleLogout}
+                className="inline-flex items-center justify-center rounded-xl border border-red-200 bg-red-50 px-5 py-3 text-sm font-bold text-red-600 transition hover:bg-red-100 hover:text-red-700"
+              >
+                Logout
+              </button>
             </div>
 
-             <button
-              type="button"
-              onClick={handleLogout}
-              className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition"
-            >
-              Logout
-            </button>
 
-          </div>
+            <div className="flex flex-col gap-3 justify-center sm:flex-row sm:items-center">
+      
+              <Link
+                href="/recruiter/create-job"
+                className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#F97316] px-5 py-3 text-sm font-bold text-white shadow-md shadow-orange-500/10 transition hover:-translate-y-0.5 hover:bg-orange-600"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clipRule="evenodd" />
+                </svg>
+                  Create New Job
+              </Link>
 
-          <div>
-            <Link
-              href="/recruiter/create-job"
-              className="inline-flex items-center gap-2 px-5 py-3 bg-[#F97316] hover:bg-orange-600 text-white font-bold rounded-xl shadow-md shadow-orange-500/10 transition-all hover:-translate-y-0.5 active:translate-y-0 text-sm active:scale-98"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clipRule="evenodd" />
-              </svg>
-              Create New Job
-            </Link>
-            
-            <Link
-              href="/recruiter/applications"
-              className="inline-flex items-center gap-2 px-5 py-3 bg-[#2563EB] hover:bg-blue-700 text-white font-bold rounded-xl shadow-md shadow-blue-500/10 transition-all hover:-translate-y-0.5 active:translate-y-0 text-sm active:scale-98 m-3"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-              </svg>
-              View Applications
-            </Link>
-          
+              <Link
+                href="/recruiter/applications"
+                className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#2563EB] px-5 py-3 text-sm font-bold text-white shadow-md shadow-blue-500/10 transition hover:-translate-y-0.5 hover:bg-blue-700"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                  View Applications
+              </Link>
+            </div>
           </div>
         </div>
+        
 
         {/* Statistics Cards Row */}
         {!error && (
@@ -366,15 +367,16 @@ export default function RecruiterDashboard() {
                 <div className="mt-8 pt-4 border-t border-slate-100 flex items-center justify-between gap-3">
                   <Link
                     href={`/recruiter/edit-job/${job.id}`}
-                    className="flex-1 py-2 px-3 text-center bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 font-semibold text-xs rounded-xl transition duration-200"
+                    className="flex-1 py-2 px-3 text-center bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 text-emerald-700 hover:text-emerald-800 font-semibold text-xs rounded-xl transition duration-200"
                   >
                     Edit Job
                   </Link>
 
                   <button
+                    type="button"
                     disabled={deleteLoadingId === job.id}
                     onClick={() => handleDeleteJob(job.id, job.title)}
-                    className="flex-1 py-2 px-3 bg-red-50 hover:bg-red-100 border border-red-100 text-red-650 hover:text-red-700 font-semibold text-xs rounded-xl transition duration-200 flex items-center justify-center gap-1 active:scale-98 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="flex-1 py-2 px-3 bg-red-50 hover:bg-red-100 border border-red-200 text-red-700 hover:text-red-800 font-semibold text-xs rounded-xl transition duration-200 flex items-center justify-center gap-1 active:scale-98 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {deleteLoadingId === job.id ? (
                       <svg className="animate-spin h-3.5 w-3.5 text-red-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">

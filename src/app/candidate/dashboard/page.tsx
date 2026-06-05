@@ -33,9 +33,8 @@ interface Application {
 export default function CandidateDashboard() {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [jobs, setJobs] = useState<Job[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [userId, setUserId] = useState("");
   const [applications, setApplications] = useState<Application[]>([]);
+  const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState({
     total: 0,
     pending: 0,
@@ -54,267 +53,331 @@ export default function CandidateDashboard() {
   };
 
   useEffect(() => {
-    const getUser = async () => {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
+    const fetchDashboardData = async () => {
+      try {
+        setLoading(true);
 
-      if (user) {
-        setUserId(user.id);
-      }
-    }
-    getUser();
-  }, []);
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
 
-  useEffect(() => {
-    if(userId) {
-      const fetchApplications = async () => {
-        try {
-          setLoading(true);
+        if (!user) {
+          router.push("/login");
+          return;
+        }
 
-          const { data, error } = await supabase
+        const { data: profileData } = await supabase
+          .from("profiles")
+          .select("*")
+          .eq("id", user.id)
+          .single();
+
+        const { data: applicationsData, error: applicationsError } =
+          await supabase
             .from("applications")
-            .select(`*, jobs(title, company_name, location)`)
-            .eq("candidate_id", userId)
+            .select("*, jobs(title, company_name, location)")
+            .eq("candidate_id", user.id)
             .order("applied_at", { ascending: false });
 
-          if (error) throw error;
+        if (applicationsError) throw applicationsError;
 
-          setApplications(data || []);
+        const { data: jobsData } = await supabase
+          .from("jobs")
+          .select("*")
+          .order("created_at", { ascending: false })
+          .limit(5);
 
-          setStats({
-            total: data?.length || 0,
-            pending: 
-              data?.filter(app => app.status === "pending").length || 0,
-            accepted: 
-              data?.filter(app => app.status === "accepted").length || 0,
-            rejected: 
-              data?.filter(app => app.status === "rejected").length || 0,
-          });
+        setProfile(profileData);
+        setApplications(applicationsData || []);
+        setJobs(jobsData || []);
 
-        } catch (error) {
-          console.error("Error fetching applications:", error);
-        } finally {
-          setLoading(false);
-        }
+        setStats({
+          total: applicationsData?.length || 0,
+          pending:
+            applicationsData?.filter((app) => app.status === "pending")
+              .length || 0,
+          accepted:
+            applicationsData?.filter((app) => app.status === "accepted")
+              .length || 0,
+          rejected:
+            applicationsData?.filter((app) => app.status === "rejected")
+              .length || 0,
+        });
+      } catch (error) {
+        console.error("Error fetching dashboard data:", error);
+      } finally {
+        setLoading(false);
       }
-      fetchApplications();
-    }
-  }, [userId]);
-
-  useEffect(() => {
-  const fetchDashboardData = async () => {
-    try {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-
-      if (!user) return;
-
-      // Profile
-      const { data: profileData } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("id", user.id)
-        .single();
-
-      setProfile(profileData);
-
-      // Recent jobs
-      const { data: jobsData } = await supabase
-        .from("jobs")
-        .select("*")
-        .order("created_at", { ascending: false })
-        .limit(5);
-
-      setJobs(jobsData || []);
-      setLoading(false);
-    } catch (error) {
-      console.error("Error fetching dashboard data:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
+    };
 
     fetchDashboardData();
-    }, []);
+  }, [router]);
 
   if (loading) {
-    return <div className="p-10">Loading...</div>;
+    return (
+      <div className="min-h-screen bg-[#F8FAFC] px-4 py-12 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-6xl space-y-6">
+          <div className="h-28 animate-pulse rounded-3xl bg-white shadow-sm" />
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
+            {[1, 2, 3, 4].map((item) => (
+              <div
+                key={item}
+                className="h-32 animate-pulse rounded-3xl bg-white shadow-sm"
+              />
+            ))}
+          </div>
+          <div className="h-72 animate-pulse rounded-3xl bg-white shadow-sm" />
+        </div>
+      </div>
+    );
   }
 
   return (
-      <div className="min-h-screen bg-slate-50 p-8">
-        <div className="max-w-6xl mx-auto">
-          <div className="flex items-center justify-between mb-6">
-            <div className="flex items-center gap-1">
-                <Link href="/profile">
-                  <img
-                    src="/default_avatar.png"
-                    alt="Profile"
-                    className="w-20 h-20 rounded-full"
+    <div className="min-h-screen bg-[#F8FAFC] px-4 py-12 text-slate-800 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-6xl">
+        {/* Dashboard Header */}
+        <div className="mb-10 border-b border-slate-100 pb-6">
+          <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+            <div className="flex items-start gap-4">
+              <Link href="/profile">
+                <img
+                  src="/default_avatar.png"
+                  alt="Profile"
+                  className="h-16 w-16 rounded-full border border-slate-200 object-cover shadow-sm"
                 />
-                </Link> 
+              </Link>
+
+              <div>
+                <h1 className="text-3xl font-extrabold tracking-tight text-[#1E293B]">
+                  Candidate Dashboard
+                </h1>
+                <p className="mt-2 text-sm text-slate-500 sm:text-base">
+                  Welcome, {profile?.email || "Candidate"}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={handleLogout}
+                className="inline-flex items-center justify-center rounded-xl border border-red-200 bg-red-50 px-5 py-3 text-sm font-bold text-red-600 transition hover:bg-red-100 hover:text-red-700"
+              >
+                Logout
+              </button>
             </div>
-            <div>
-              <h1 className="text-3xl font-extrabold tracking-tight text-[#1E293B]">
-                Candidate Dashboard
-              </h1>
-              <p className="text-slate-500 mb-8">Welcome, {profile?.email}</p>
+
+            <div className="flex flex-col gap-3 justify-center sm:flex-row sm:items-center">
+
+              <Link
+                href="/candidate/applications"
+                className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#2563EB] px-5 py-3 text-sm font-bold text-white shadow-md shadow-blue-500/10 transition hover:-translate-y-0.5 hover:bg-blue-700"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-5 w-5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                  />
+                </svg>
+                View Applications
+              </Link>
+              
             </div>
-            
-            <button
-              type="button"
-              onClick={handleLogout}
-              className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition"
+          </div>
+        </div>
+
+        {/* Stat Cards */}
+        <div className="mb-10 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="rounded-3xl border border-slate-100 bg-white p-6 shadow-sm transition hover:shadow-md">
+            <p className="text-sm font-semibold text-slate-500">
+              Total Applications
+            </p>
+            <h3 className="mt-2 text-3xl font-extrabold text-[#1E293B]">
+              {stats.total}
+            </h3>
+            <p className="mt-1 text-xs text-blue-600">Applications submitted</p>
+          </div>
+
+          <div className="rounded-3xl border border-slate-100 bg-white p-6 shadow-sm transition hover:shadow-md">
+            <p className="text-sm font-semibold text-slate-500">Pending</p>
+            <h3 className="mt-2 text-3xl font-extrabold text-[#1E293B]">
+              {stats.pending}
+            </h3>
+            <p className="mt-1 text-xs text-orange-600">Awaiting review</p>
+          </div>
+
+          <div className="rounded-3xl border border-slate-100 bg-white p-6 shadow-sm transition hover:shadow-md">
+            <p className="text-sm font-semibold text-slate-500">Accepted</p>
+            <h3 className="mt-2 text-3xl font-extrabold text-[#1E293B]">
+              {stats.accepted}
+            </h3>
+            <p className="mt-1 text-xs text-green-600">Successful responses</p>
+          </div>
+
+          <div className="rounded-3xl border border-slate-100 bg-white p-6 shadow-sm transition hover:shadow-md">
+            <p className="text-sm font-semibold text-slate-500">Rejected</p>
+            <h3 className="mt-2 text-3xl font-extrabold text-[#1E293B]">
+              {stats.rejected}
+            </h3>
+            <p className="mt-1 text-xs text-red-600">Closed applications</p>
+          </div>
+        </div>
+
+        {/* Profile Section */}
+        <div className="mb-8 rounded-3xl border border-slate-100 bg-white p-6 shadow-sm">
+          <div className="mb-5 flex items-center justify-between gap-4">
+            <h2 className="text-xl font-bold text-[#1E293B]">My Profile</h2>
+
+            <Link
+              href="/profile/edit"
+              className="rounded-xl bg-green-600 px-4 py-2 text-sm font-bold text-white transition hover:bg-green-700"
             >
-              Logout
-            </button>
-          </div>
-          
-          <Link
-            href="/candidate/applications"
-            className="inline-flex items-center gap-2 px-5 py-3 bg-[#2563EB] hover:bg-blue-700 text-white font-bold rounded-xl shadow-md shadow-blue-500/10 transition-all hover:-translate-y-0.5 active:translate-y-0 text-sm active:scale-98 m-3"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-            </svg>
-            View Applications
-          </Link>
-
-          {/* Stat Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-
-            <div className="bg-white p-6 rounded-xl shadow">
-              <h3 className="text-slate-500">
-                Total Applications
-              </h3>
-              <p className="text-3xl font-bold">
-                {stats.total}
-              </p>
-            </div>
-
-            <div className="bg-white p-6 rounded-xl shadow">
-              <h3 className="text-slate-500">
-                Pending
-              </h3>
-              <p className="text-3xl font-bold">
-                {stats.pending}
-              </p>
-            </div>
-
-            <div className="bg-white p-6 rounded-xl shadow">
-              <h3 className="text-slate-500">
-                Accepted
-              </h3>
-              <p className="text-3xl font-bold">
-                {stats.accepted}
-              </p>
-            </div>
-
-            <div className="bg-white p-6 rounded-xl shadow">
-              <h3 className="text-slate-500">
-                Rejected
-              </h3>
-              <p className="text-3xl font-bold">
-                {stats.rejected}
-              </p>
-            </div>
+              Edit Profile
+            </Link>
           </div>
 
-          {/* Profile Section */}
-          <div className="bg-white p-6 rounded-xl shadow mb-8">
-            <h2 className="text-xl font-semibold mb-4">My Profile</h2>
-
-            <div className="space-y-2">
-              <p>
-                <strong>Name:</strong>{" "} 
+          <div className="grid gap-4 sm:grid-cols-3">
+            <div className="rounded-2xl bg-slate-50 p-4">
+              <p className="text-xs font-semibold uppercase text-slate-400">
+                Name
+              </p>
+              <p className="mt-1 font-semibold text-[#1E293B]">
                 {profile?.full_name || "Not Updated"}
               </p>
-              <p>
-                <strong>Email:</strong>{" "}
+            </div>
+
+            <div className="rounded-2xl bg-slate-50 p-4">
+              <p className="text-xs font-semibold uppercase text-slate-400">
+                Email
+              </p>
+              <p className="mt-1 break-all font-semibold text-[#1E293B]">
                 {profile?.email}
               </p>
+            </div>
 
-              <p>
-                <strong>Role:</strong>{" "}
+            <div className="rounded-2xl bg-slate-50 p-4">
+              <p className="text-xs font-semibold uppercase text-slate-400">
+                Role
+              </p>
+              <p className="mt-1 font-semibold capitalize text-[#1E293B]">
                 {profile?.role}
               </p>
             </div>
           </div>
+        </div>
 
-          {/* My Applications */}
-          <div className="bg-white rounded-xl shadow p-6 mb-8">
-
-            <h2 className="text-xl font-bold mb-4">
+        {/* My Applications */}
+        <div className="mb-8 rounded-3xl border border-slate-100 bg-white p-6 shadow-sm">
+          <div className="mb-5 flex items-center justify-between gap-4">
+            <h2 className="text-xl font-bold text-[#1E293B]">
               My Applications
             </h2>
 
-            {applications.length === 0 ? (
-              <p>No applications yet.</p>
-            ) : (
-              <div className="space-y-4">
+            <Link
+              href="/candidate/applications"
+              className="text-sm font-bold text-[#2563EB] hover:text-blue-700"
+            >
+              View all
+            </Link>
+          </div>
 
-                {applications.map((app) => (
-                  <div
-                    key={app.id}
-                    className="border rounded-lg p-4"
-                  >
-                    <h3 className="font-semibold">
-                      {app.jobs?.title}
-                    </h3>
-
-                    <p className="text-gray-600">
-                      {app.jobs?.company_name}
-                    </p>
-
-                    <p className="text-sm text-gray-500">
-                      {app.jobs?.location}
-                    </p>
+          {applications.length === 0 ? (
+            <div className="rounded-2xl border border-slate-100 bg-slate-50 p-8 text-center">
+              <p className="font-semibold text-[#1E293B]">
+                No applications yet
+              </p>
+              <p className="mt-1 text-sm text-slate-500">
+                Start applying to jobs and track them here.
+              </p>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {applications.map((app) => (
+                <div
+                  key={app.id}
+                  className="rounded-2xl border border-slate-100 p-5 transition hover:border-slate-200 hover:bg-slate-50"
+                >
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                    <div>
+                      <h3 className="font-bold text-[#1E293B]">
+                        {app.jobs?.title}
+                      </h3>
+                      <p className="mt-1 text-sm font-semibold text-slate-500">
+                        {app.jobs?.company_name}
+                      </p>
+                      <p className="mt-1 text-sm text-slate-500">
+                        {app.jobs?.location}
+                      </p>
+                    </div>
 
                     <span
-                      className={`inline-block mt-2 px-3 py-1 rounded-full text-sm
-                      ${
+                      className={`inline-flex w-fit rounded-full px-3 py-1 text-xs font-bold capitalize ${
                         app.status === "accepted"
                           ? "bg-green-100 text-green-700"
                           : app.status === "rejected"
                           ? "bg-red-100 text-red-700"
-                          : "bg-yellow-100 text-yellow-700"
+                          : "bg-orange-100 text-orange-700"
                       }`}
                     >
                       {app.status}
                     </span>
                   </div>
-                ))}
-
-              </div>
-           )}
-          </div>
-
-          {/* Recent Jobs */}
-          <div className="bg-white p-6 rounded-xl shadow">
-            <h2 className="text-xl font-semibold mb-4">Recent Jobs</h2>
-
-            <div className="space-y-4">
-              {jobs.map((job) => (
-                <div 
-                  key={job.id} 
-                  className="border p-4 rounded-lg"
-                >
-                  <h3 className="font-semibold">
-                    {job.title}
-                  </h3>
-
-                  <p className="text-slate-500">{job.company_name}</p>
-                  
-                   <p className="text-sm text-slate-500">{job.location}</p>
                 </div>
-                
               ))}
             </div>
+          )}
+        </div>
+
+        {/* Recent Jobs */}
+        <div className="rounded-3xl border border-slate-100 bg-white p-6 shadow-sm">
+          <div className="mb-5 flex items-center justify-between gap-4">
+            <h2 className="text-xl font-bold text-[#1E293B]">Recent Jobs</h2>
+
+            <Link
+              href="/jobs"
+              className="text-sm font-bold text-[#2563EB] hover:text-blue-700"
+            >
+              Browse jobs
+            </Link>
           </div>
 
+          {jobs.length === 0 ? (
+            <div className="rounded-2xl border border-slate-100 bg-slate-50 p-8 text-center">
+              <p className="font-semibold text-[#1E293B]">No jobs found</p>
+              <p className="mt-1 text-sm text-slate-500">
+                New job listings will appear here.
+              </p>
+            </div>
+          ) : (
+            <div className="grid gap-4 md:grid-cols-2">
+              {jobs.map((job) => (
+                <div
+                  key={job.id}
+                  className="rounded-2xl border border-slate-100 p-5 transition hover:border-slate-200 hover:bg-slate-50"
+                >
+                  <h3 className="font-bold text-[#1E293B]">{job.title}</h3>
+                  <p className="mt-1 text-sm font-semibold text-slate-500">
+                    {job.company_name}
+                  </p>
+                  <p className="mt-1 text-sm text-slate-500">{job.location}</p>
+
+                  <Link
+                    href={`/jobs/${job.id}`}
+                    className="mt-4 inline-flex rounded-xl bg-[#2563EB] px-4 py-2 text-sm font-bold text-white transition hover:bg-blue-700"
+                  >
+                    View Job
+                  </Link>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
-    );
+    </div>
+  );
 }
