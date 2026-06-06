@@ -4,6 +4,7 @@ import Link from "next/link";
 import { FormEvent, ReactNode, useEffect, useState } from "react";
 import type { User } from "@supabase/supabase-js";
 import { supabase } from "@/src/lib/supabase";
+import Logo from "@/src/components/Logo";
 import Image from "next/image";
 
 interface Job {
@@ -265,15 +266,10 @@ function Navbar() {
       <nav className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
         <Link
           href="/"
-          className="flex items-center gap-3"
+          className="flex items-center"
           aria-label="Job Portal home"
         >
-          <span className="flex h-8 w-8 items-center justify-center rounded-2xl bg-[#2563EB] text-lg font-extrabold text-white shadow-sm">
-            J
-          </span>
-          <span className="text-lg font-extrabold text-[#1E293B]">
-            Job Portal
-          </span>
+          <Logo className="w-10 h-10" withText={true} />
         </Link>
 
         <div className="hidden items-center justify-center gap-6 text-md font-bold text-slate-500 md:flex">
@@ -891,12 +887,7 @@ function Footer() {
           
           <div className="md:col-span-2">
             <div className="flex flex-col items-center gap-2 pb-2">
-              <span className="flex h-8 w-8 items-center justify-center rounded-2xl bg-[#2563EB] text-lg font-extrabold text-white">
-                J
-              </span>
-              <span className="text-lg font-extrabold text-[#1E293B]">
-                Job Portal
-              </span>
+              <Logo className="w-12 h-12" withText={true} />
 
               <p className="md:my-4 sm:my-2 max-w-md text-sm text-center text-slate-500">
                 A professional platform for candidates, recruiters, and admins to

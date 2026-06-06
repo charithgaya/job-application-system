@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation"; // Fixed: Using next/navigation instead of legacy router
 import { supabase } from "@/src/lib/supabase";
 import Link from "next/link";
+import Logo from "@/src/components/Logo";
 
 export default function LoginPage() {
   const router = useRouter(); // Initialize correct App Router router
@@ -87,10 +88,8 @@ export default function LoginPage() {
         <div className="absolute top-0 left-0 right-0 h-1.5 bg-[#2563EB]" />
 
         {/* Decorative Circular Icon */}
-        <div className="w-16 h-16 rounded-2xl bg-blue-50 border border-blue-100 flex items-center justify-center mx-auto mb-6 text-[#2563EB]">
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-          </svg>
+        <div className="flex justify-center mb-6">
+          <Logo className="w-16 h-16" />
         </div>
 
         {/* Header Titles */}

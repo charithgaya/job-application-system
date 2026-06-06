@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/src/lib/supabase";
+import Logo from "@/src/components/Logo";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -97,10 +98,8 @@ export default function RegisterPage() {
         <div className="absolute top-0 left-0 right-0 h-1.5 bg-[#2563EB]" />
 
         {/* Decorative Circular Logo Icon */}
-        <div className="w-16 h-16 rounded-2xl bg-blue-50 border border-blue-100 flex items-center justify-center mx-auto mb-6 text-[#2563EB]">
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
-          </svg>
+        <div className="flex justify-center mb-6">
+          <Logo className="w-16 h-16" />
         </div>
 
         {/* Header Texts */}
