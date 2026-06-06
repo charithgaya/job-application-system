@@ -136,23 +136,67 @@ export default function Page() {
       if (!mounted) return;
 
       setUser(user);
-      setRole((user?.user_metadata?.role as string) ?? null);
+      if (user) {
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("role")
+          .eq("id", user.id)
+          .single();
+        setRole(profile?.role || user.user_metadata?.role || null);
+      } else {
+        setRole(null);
+      }
     };
 
     loadUser();
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
+    } = supabase.auth.onAuthStateChange(async (_event, session) => {
       const nextUser = session?.user ?? null;
+      if (!mounted) return;
       setUser(nextUser);
-      setRole((nextUser?.user_metadata?.role as string) ?? null);
+      if (nextUser) {
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("role")
+          .eq("id", nextUser.id)
+          .single();
+        if (mounted) setRole(profile?.role || nextUser.user_metadata?.role || null);
+      } else {
+        if (mounted) setRole(null);
+      }
     });
 
     return () => {
       mounted = false;
       subscription.unsubscribe();
     };
+  }, []);
+
+  useEffect(() => {
+    const fetchLatestJobs = async () => {
+      try {
+        setLoadingJobs(true);
+        setJobsError("");
+
+        const { data, error } = await supabase
+          .from("jobs")
+          .select("id, title, company_name, location, job_type, salary_range")
+          .order("created_at", { ascending: false })
+          .limit(6);
+
+        if (error) throw error;
+        setJobs((data || []) as Job[]);
+      } catch (error) {
+        console.error("Failed to fetch latest jobs:", error);
+        setJobsError("Unable to load featured jobs right now.");
+      } finally {
+        setLoadingJobs(false);
+      }
+    };
+
+    fetchLatestJobs();
   }, []);
 
 
@@ -231,7 +275,6 @@ export default function Page() {
 
 function Navbar() {
   const [user, setUser] = useState<User | null>(null);
-  const [role, setRole] = useState<string | null>(null);
 
   useEffect(() => {
     let mounted = true;
@@ -243,7 +286,6 @@ function Navbar() {
 
       if (!mounted) return;
       setUser(user ?? null);
-      setRole((user?.user_metadata?.role as string) ?? null);
     };
 
     load();
@@ -253,7 +295,6 @@ function Navbar() {
     } = supabase.auth.onAuthStateChange((_event, session) => {
       const nextUser = session?.user ?? null;
       setUser(nextUser);
-      setRole((nextUser?.user_metadata?.role as string) ?? null);
     });
 
     return () => {
