@@ -4,6 +4,7 @@ import Link from "next/link";
 import { FormEvent, ReactNode, useEffect, useState } from "react";
 import type { User } from "@supabase/supabase-js";
 import { supabase } from "@/src/lib/supabase";
+import Image from "next/image";
 
 interface Job {
   id: string | number;
@@ -121,7 +122,7 @@ export default function Page() {
   const [jobsError, setJobsError] = useState("");
   const [contactMessage, setContactMessage] = useState("");
   const [newsletterMessage, setNewsletterMessage] = useState("");
-  const [jobCount, setJobCount] = useState(0);
+  
 
   useEffect(() => {
     let mounted = true;
@@ -153,40 +154,6 @@ export default function Page() {
     };
   }, []);
 
-  useEffect(() => {
-    const fetchLatestJobs = async () => {
-      try {
-        setLoadingJobs(true);
-        setJobsError("");
-
-        const { count } = await supabase
-          .from("jobs")
-          .select("*", {
-            count: "exact",
-            head: true,
-        });
-
-        setJobCount(count || 0);
-
-        const { data, error } = await supabase
-          .from("jobs")
-          .select("id, title, company_name, location, job_type, salary_range")
-          .order("created_at", { ascending: false })
-          .limit(6);
-
-        if (error) throw error;
-
-        setJobs((data || []) as Job[]);
-      } catch (error) {
-        console.error("Failed to fetch latest jobs:", error);
-        setJobsError("Unable to load featured jobs right now.");
-      } finally {
-        setLoadingJobs(false);
-      }
-    };
-
-    fetchLatestJobs();
-  }, []);
 
   const handleContactSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -208,27 +175,31 @@ export default function Page() {
         <HeroSection />
         {user && (
           <section className="py-4">
-            <div className="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm">
-              <h2 className="text-2xl font-bold text-[#1E293B]">
-                 Welcome Back 👋
-              </h2>
+            <div className="flex items-center justify-between rounded-2xl border border-slate-100 bg-white p-6 shadow-sm">
+              <div className="">
+                <h2 className="text-2xl font-bold text-[#1E293B]">
+                   Welcome Back 👋
+                </h2>
+                <p className="mt-2 text-slate-500">
+                  Continue where you left off.
+                </p>
+              </div>
 
-              <p className="mt-2 text-slate-500">
-                Continue where you left off.
-              </p>
-
-              <Link
-                href={
+              <div className="flex items-center justify-center">
+                <Link
+                  href={
                   role === "candidate"
                   ? "/candidate/dashboard"
                   : role === "recruiter"
                   ? "/recruiter/dashboard"
                   : "/admin/dashboard"
-                }
-                className="mt-4 inline-flex rounded-xl bg-[#2563EB] px-5 py-3 font-bold text-white hover:bg-blue-700"
-              >
-                Go To Dashboard
-              </Link>
+                  }
+                  className="mt-4 inline-flex rounded-xl bg-[#2563EB] px-5 py-3 font-bold text-white hover:bg-blue-700"
+                >
+                  Go To Dashboard
+                </Link>
+              </div>
+              
             </div>
           </section>
         )}
@@ -322,17 +293,14 @@ function Navbar() {
 
         <div className="flex items-center gap-3">
         {user ? (
-          <Link
-            href={
-            role === "candidate"
-            ? "/candidate/dashboard"
-            : role === "recruiter"
-            ? "/recruiter/dashboard"
-            : "/admin/dashboard"
-          }
-            className="bg-[#2563EB] text-white px-4 py-2 rounded-xl font-semibold"
-          >
-            My Dashboard
+          <Link href="/profile">
+            <Image
+              src="/default_avatar.png"
+              alt="Profile"
+              width={64}
+              height={64}
+              className="h-12 w-12 rounded-full border border-slate-200 object-cover shadow-sm"
+             />
           </Link>
         ) : (
         <>

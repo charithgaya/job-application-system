@@ -9,6 +9,7 @@ import {
   ClipboardList,
 } from "lucide-react";
 import { supabase } from "@/src/lib/supabase";
+import Image from "next/image";
 
 interface Profile {
   id: string;
@@ -22,14 +23,6 @@ interface Job {
   title: string;
   company_name: string;
   recruiter_id: string;
-}
-
-interface Application {
-  id: string;
-  candidate_id: string;
-  job_id: string;
-  status: string;
-  applied_at: string;
 }
 
 async function getCount(
@@ -121,10 +114,12 @@ export default async function AdminDashboardPage() {
       <div>
         <div className="flex items-center gap-1">
           <Link href="/profile">
-            <img
+            <Image
               src="/default_avatar.png"
               alt="Profile"
               className="w-20 h-20 rounded-full"
+              width={60}
+              height={60}
             />
           </Link> 
         </div>
