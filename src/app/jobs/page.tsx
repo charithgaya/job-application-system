@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { supabase } from "@/src/lib/supabase";
+import { useRouter } from "next/navigation";
 
 // Define TypeScript Interface matching database columns
 interface Job {
@@ -33,6 +34,7 @@ const CATEGORIES = [
 ];
 
 export default function PublicJobsPage() {
+  const router = useRouter();
   const [jobs, setJobs] = useState<Job[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -106,6 +108,30 @@ export default function PublicJobsPage() {
   return (
     <div className="min-h-screen bg-[#F8FAFC] text-slate-800 py-16 px-4 sm:px-6 lg:px-8">
       <div className="max-w-6xl mx-auto">
+
+        <div className="flex flex-wrap items-center justify-start gap-2"> 
+            <button
+              type="button"
+              onClick={() => router.push("/")}
+              className="inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold text-blue-600 transition hover:bg-blue-50"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-4 w-4"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M10 19l-7-7m0 0l7-7m-7 7h18"
+                />
+              </svg>
+                Go to Home
+            </button>
+        </div>
         
         {/* Page Hero Header */}
         <div className="text-center mb-16">
