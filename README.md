@@ -128,22 +128,22 @@ npm start
 ## Screenshots
 
 ### Home Page
-*(Add Screenshot)*
+(screenshots/homePage.png)
 
 ### Candidate Dashboard
-*(Add Screenshot)*
+(/public/screenshots/CandidateDashboard.png)
 
 ### Recruiter Dashboard
-*(Add Screenshot)*
+(/public/screenshots/RecruiterDashboard.png)
 
 ### Admin Dashboard
-*(Add Screenshot)*
+(/public/screenshots/AdminDashboard.png)
 
 ### Job Listings
-*(Add Screenshot)*
+(/public/screenshots/JobsPage.png)
 
 ### Application Management
-*(Add Screenshot)*
+(/public/screenshots/ApplicationManagement.png)
 
 ## Future Improvements
 
