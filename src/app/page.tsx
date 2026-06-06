@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { FormEvent, ReactNode, useEffect, useState } from "react";
+import type { User } from "@supabase/supabase-js";
 import { supabase } from "@/src/lib/supabase";
 
 interface Job {
@@ -113,17 +114,59 @@ const testimonials: Testimonial[] = [
 ];
 
 export default function Page() {
+  const [user, setUser] = useState<User | null>(null);
+  const [role, setRole] = useState<string | null>(null);
   const [jobs, setJobs] = useState<Job[]>([]);
   const [loadingJobs, setLoadingJobs] = useState(true);
   const [jobsError, setJobsError] = useState("");
   const [contactMessage, setContactMessage] = useState("");
   const [newsletterMessage, setNewsletterMessage] = useState("");
+  const [jobCount, setJobCount] = useState(0);
+
+  useEffect(() => {
+    let mounted = true;
+
+    const loadUser = async () => {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      if (!mounted) return;
+
+      setUser(user);
+      setRole((user?.user_metadata?.role as string) ?? null);
+    };
+
+    loadUser();
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      const nextUser = session?.user ?? null;
+      setUser(nextUser);
+      setRole((nextUser?.user_metadata?.role as string) ?? null);
+    });
+
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
+  }, []);
 
   useEffect(() => {
     const fetchLatestJobs = async () => {
       try {
         setLoadingJobs(true);
         setJobsError("");
+
+        const { count } = await supabase
+          .from("jobs")
+          .select("*", {
+            count: "exact",
+            head: true,
+        });
+
+        setJobCount(count || 0);
 
         const { data, error } = await supabase
           .from("jobs")
@@ -163,6 +206,32 @@ export default function Page() {
 
       <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
         <HeroSection />
+        {user && (
+          <section className="py-4">
+            <div className="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm">
+              <h2 className="text-2xl font-bold text-[#1E293B]">
+                 Welcome Back 👋
+              </h2>
+
+              <p className="mt-2 text-slate-500">
+                Continue where you left off.
+              </p>
+
+              <Link
+                href={
+                  role === "candidate"
+                  ? "/candidate/dashboard"
+                  : role === "recruiter"
+                  ? "/recruiter/dashboard"
+                  : "/admin/dashboard"
+                }
+                className="mt-4 inline-flex rounded-xl bg-[#2563EB] px-5 py-3 font-bold text-white hover:bg-blue-700"
+              >
+                Go To Dashboard
+              </Link>
+            </div>
+          </section>
+        )}
         <StatsSection />
         <FeaturedJobsSection
           jobs={jobs}
@@ -189,6 +258,37 @@ export default function Page() {
 }
 
 function Navbar() {
+  const [user, setUser] = useState<User | null>(null);
+  const [role, setRole] = useState<string | null>(null);
+
+  useEffect(() => {
+    let mounted = true;
+
+    const load = async () => {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      if (!mounted) return;
+      setUser(user ?? null);
+      setRole((user?.user_metadata?.role as string) ?? null);
+    };
+
+    load();
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      const nextUser = session?.user ?? null;
+      setUser(nextUser);
+      setRole((nextUser?.user_metadata?.role as string) ?? null);
+    });
+
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
+  }, []);
   return (
     <header className="border-b border-slate-100 bg-white mb-2">
       <nav className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
@@ -221,18 +321,36 @@ function Navbar() {
         </div>
 
         <div className="flex items-center gap-3">
+        {user ? (
+          <Link
+            href={
+            role === "candidate"
+            ? "/candidate/dashboard"
+            : role === "recruiter"
+            ? "/recruiter/dashboard"
+            : "/admin/dashboard"
+          }
+            className="bg-[#2563EB] text-white px-4 py-2 rounded-xl font-semibold"
+          >
+            My Dashboard
+          </Link>
+        ) : (
+        <>
           <Link
             href="/login"
-            className="hidden rounded-xl border border-slate-200 bg-[#F97316] px-4 py-2 text-sm font-bold text-white transition hover:bg-orange-700 sm:inline-flex shadow-md shadow-orange-500/10"
+            className="hidden rounded-xl border border-slate-200 bg-[#F97316] px-4 py-2 text-sm font-bold text-white transition hover:bg-orange-700 sm:inline-flex"
           >
-            Login
+            Sign In
           </Link>
+
           <Link
             href="/register"
             className="rounded-xl bg-[#F97316] px-4 py-2 text-sm font-bold text-white shadow-md shadow-orange-500/10 transition hover:bg-orange-700"
           >
-            Register
+            Sign Up
           </Link>
+        </>
+          )}
         </div>
       </nav>
     </header>
@@ -240,6 +358,34 @@ function Navbar() {
 }
 
 function HeroSection() {
+  const [user, setUser] = useState<User | null>(null);
+
+  useEffect(() => {
+    let mounted = true;
+
+    const load = async () => {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      if (!mounted) return;
+      setUser(user ?? null);
+    };
+
+    load();
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+    });
+
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
+  }, []);
+
   return (
     <section className="overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm">
       <div className="grid gap-8 p-6 sm:p-8 lg:grid-cols-[1.05fr_0.95fr] lg:p-10">
@@ -266,7 +412,7 @@ function HeroSection() {
               Browse Jobs
             </Link>
             <Link
-              href="/recruiter/create-job"
+              href={user ? "/recruiter/create-job" : "/login"}
               className="inline-flex items-center justify-center rounded-xl bg-[#F97316] px-6 py-3 text-sm font-bold text-white shadow-md shadow-orange-500/10 transition hover:-translate-y-0.5 hover:bg-orange-600"
             >
               Post a Job
@@ -281,7 +427,7 @@ function HeroSection() {
                 Hiring Overview
               </p>
               <h2 className="mt-1 text-2xl font-extrabold text-[#1E293B]">
-                245 matches
+                Latest Opportunities
               </h2>
             </div>
             <div className="rounded-2xl bg-blue-50 p-3 text-[#2563EB]">
@@ -289,32 +435,7 @@ function HeroSection() {
             </div>
           </div>
 
-          <div className="space-y-4">
-            {["Senior UI Engineer", "Product Manager", "Data Analyst"].map(
-              (title, index) => (
-                <div
-                  key={title}
-                  className="rounded-2xl border border-slate-100 bg-white p-4 shadow-sm"
-                >
-                  <div className="flex items-center justify-between gap-4">
-                    <div>
-                      <h3 className="font-bold text-[#1E293B]">{title}</h3>
-                      <p className="mt-1 text-sm text-slate-500">
-                        {index === 0
-                          ? "Remote"
-                          : index === 1
-                            ? "Colombo"
-                            : "Hybrid"}
-                      </p>
-                    </div>
-                    <span className="rounded-full bg-green-100 px-3 py-1 text-xs font-bold text-green-700">
-                      Match
-                    </span>
-                  </div>
-                </div>
-              ),
-            )}
-          </div>
+          
         </div>
       </div>
     </section>
@@ -402,21 +523,21 @@ function FeaturedJobsSection({
               className="flex h-full flex-col justify-between rounded-2xl border border-slate-100 bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:border-slate-200 hover:shadow-md"
             >
               <div>
-                <div className="mb-5 flex items-center justify-between gap-3">
-                  <span className="rounded-full bg-blue-50 px-3 py-1 text-xs font-bold text-[#2563EB]">
-                    {job.job_type || "Full Time"}
-                  </span>
-                  <span className="text-xs font-semibold text-slate-400">
-                    {job.location || "Remote"}
-                  </span>
-                </div>
-
                 <h3 className="text-xl font-extrabold text-[#1E293B]">
                   {job.title}
                 </h3>
                 <p className="mt-2 text-sm font-semibold text-slate-500">
                   {job.company_name}
                 </p>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  <span className="rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-[#2563EB]">
+                    {job.location}
+                  </span>
+
+                  <span className="rounded-full bg-green-50 px-3 py-1 text-xs font-semibold text-green-700">
+                    {job.job_type}
+                  </span>
+                </div>
                 <p className="mt-4 text-sm text-slate-500">
                   Salary: {job.salary_range || "Not disclosed"}
                 </p>

@@ -13,6 +13,7 @@ export default function ProfilePage() {
   const [skills, setSkills] = useState("");
   const [bio, setBio] = useState("");
   const [role, setRole] = useState("");
+  const [cvUrl, setCvUrl] = useState<string | null>(null);
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -54,6 +55,7 @@ export default function ProfilePage() {
           setSkills(data.skills || "");
           setBio(data.bio || "");
           setRole(data.role || "");
+          setCvUrl(data.cv_url || null);
         }
       } catch (error) {
         console.error("Error fetching profile:", error);
@@ -94,6 +96,7 @@ export default function ProfilePage() {
           location,
           skills,
           bio,
+          cv_url: cvUrl,
         })
         .eq("id", user.id);
 
@@ -113,6 +116,44 @@ export default function ProfilePage() {
       setSaving(false);
     }
   };
+
+  const uploadCV = async (
+    file: File
+  ) => {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      return;
+    }
+
+    const fileName =
+      `${user.id}-${Date.now()}`;
+
+    const { error } = await supabase
+      .storage
+      .from("cvs")
+      .upload(fileName, file);
+
+      if (error) {
+      console.error(error);
+      return;
+    }
+
+    const {
+      data: { publicUrl },
+    } = supabase.storage
+      .from("cvs")
+      .getPublicUrl(fileName);
+
+    await supabase
+      .from("profiles")
+      .update({
+        cv_url: publicUrl,
+      })
+      .eq("id", user.id);
+};
 
   if (loading) {
     return (
@@ -146,14 +187,8 @@ export default function ProfilePage() {
               </p>
             </div>
 
-            {/* <Link
-              href={dashboardHref}
-              className="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-[#2563EB] px-5 py-3 text-sm font-bold text-white transition hover:bg-blue-700"
-            >
-              Back to Dashboard
-            </Link> */}
-
             <button
+                type="button"
                 onClick={() => router.push(dashboardHref)}
                 className="inline-flex items-center gap-2 text-sm font-semibold text-[#2563EB] hover:text-blue-700 transition"
               >
@@ -266,6 +301,36 @@ export default function ProfilePage() {
                 placeholder="Write a short professional summary"
               />
             </div>
+
+            <div>
+              <label className="block text-sm font-bold text-slate-700">
+                Upload CV
+              </label>
+              <input
+                title="Upload CV"
+                type="file"
+                accept=".pdf,.doc,.docx"
+                className="mt-2 w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none transition focus:border-[#2563EB] focus:ring-2 focus:ring-blue-100"
+                onChange={(e) => {
+                  const file =
+                    e.target.files?.[0];
+
+                  if (file) {
+                    uploadCV(file);
+                  }
+                }}
+              />
+            </div>
+            {cvUrl && (
+              <a
+                href={cvUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="text-blue-600"
+              >
+                View Uploaded CV
+              </a>
+            )}
           </div>
 
           <div className="mt-8 flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-end">
