@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "../../lib/supabase";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -160,7 +161,7 @@ export default function ProfilePage() {
       <div className="min-h-screen bg-[#F8FAFC] px-4 py-12 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-4xl space-y-6">
           <div className="h-24 animate-pulse rounded-3xl bg-white shadow-sm" />
-          <div className="h-[520px] animate-pulse rounded-3xl bg-white shadow-sm" />
+          <div className="h-130 animate-pulse rounded-3xl bg-white shadow-sm" />
         </div>
       </div>
     );
@@ -215,10 +216,12 @@ export default function ProfilePage() {
 
         <div className="rounded-3xl border border-slate-100 bg-white p-6 shadow-sm sm:p-8">
           <div className="mb-8 flex items-start gap-4">
-            <img
+            <Image
               src="/default_avatar.png"
               alt="Profile"
               className="h-16 w-16 rounded-full border border-slate-200 object-cover shadow-sm"
+              width={64}
+              height={64}
             />
 
             <div>

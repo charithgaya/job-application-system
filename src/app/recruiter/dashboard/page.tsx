@@ -1,10 +1,11 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { supabase } from "@/src/lib/supabase";
 import { User } from "@supabase/supabase-js";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 // Define TypeScript Interface for Job items based on database columns
 interface Job {
@@ -168,73 +169,117 @@ export default function RecruiterDashboard() {
 
         {/* Dashboard Header */}
         <div className="mb-10 border-b border-slate-100 pb-6">
-          <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
-            <div className="flex items-start gap-4">
-              <Link href="/profile">
-                <img
+          <div className="flex flex-col gap-6">
+    
+            {/* Top Section */}
+            <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+      
+              {/* Profile + Title */}
+              <div className="flex items-center justify-center gap-8">
+                <Link href="/profile">
+                  <Image
                   src="/default_avatar.png"
                   alt="Profile"
+                  width={64}
+                  height={64}
                   className="h-16 w-16 rounded-full border border-slate-200 object-cover shadow-sm"
                 />
-              </Link>
+                </Link>
 
-              <div>
-                <h1 className="text-3xl font-extrabold tracking-tight text-[#1E293B]">
-                  Recruiter Dashboard
-                </h1>
-                <p className="mt-2 text-sm text-slate-500 sm:text-base">
-                  {user
-                    ? `Logged in as: ${user.email}`
-                    : "Manage and track your active job opportunities."}
-                </p>
+                <div className="">
+                  <h1 className="text-3xl font-extrabold tracking-tight text-slate-800">
+                    Recruiter Dashboard
+                  </h1>
+
+                  <p className="mt-1 text-sm text-slate-500">
+                    {user
+                      ? `Logged in as: ${user.email}`
+                      : "Manage and track your active job opportunities."}
+                  </p>
+                </div>
+
+                {/* Utility Actions */}
+                <div className="flex flex-wrap items-center justify-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => router.push("/")}
+                    className="inline-flex items-center gap-2 rounded-xl border border-blue-200 px-4 py-2 text-sm font-semibold text-blue-600 transition hover:bg-blue-50"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-4 w-4"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M10 19l-7-7m0 0l7-7m-7 7h18"
+                      />
+                    </svg>
+                    Home
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={handleLogout}
+                    className="inline-flex items-center justify-center rounded-xl border border-red-200 bg-red-50 px-4 py-2 text-sm font-semibold text-red-600 transition hover:bg-red-100"
+                  >
+                    Logout
+                  </button>
+                </div>
               </div>
-              <div className="">
-                <button
-                  type="button"
-                  onClick={handleLogout}
-                  className="inline-flex items-center justify-center rounded-xl border border-red-200 bg-red-50 px-5 py-3 text-sm font-bold text-red-600 transition hover:bg-red-100 hover:text-red-700"
-                >
-                  Logout
-                </button>
-              </div>
-              
-                <button
-                  type="button"
-                  onClick={() => router.push("/")}
-                  className="inline-flex items-center gap-2 text-sm font-semibold text-[#2563EB] hover:text-blue-700 transition"
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                  </svg>
-                  Back to Home
-                </button>
             </div>
 
-
-            <div className="flex flex-col gap-3 justify-center sm:flex-row sm:items-center">
-      
+            {/* Primary Actions */}
+            <div className="flex flex-wrap items-center justify-center gap-3">
               <Link
                 href="/recruiter/create-job"
                 className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#F97316] px-5 py-3 text-sm font-bold text-white shadow-md shadow-orange-500/10 transition hover:-translate-y-0.5 hover:bg-orange-600"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                  <path fillRule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clipRule="evenodd" />
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-5 w-5"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
+                    clipRule="evenodd"
+                  />
                 </svg>
-                  Create New Job
+                Create New Job
               </Link>
 
               <Link
                 href="/recruiter/applications"
                 className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#2563EB] px-5 py-3 text-sm font-bold text-white shadow-md shadow-blue-500/10 transition hover:-translate-y-0.5 hover:bg-blue-700"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-5 w-5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                  />
                 </svg>
                   View Applications
               </Link>
             </div>
+
           </div>
         </div>
+        
+        
         
 
         {/* Statistics Cards Row */}
