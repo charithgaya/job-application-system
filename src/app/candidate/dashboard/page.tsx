@@ -4,6 +4,7 @@ import { supabase } from "@/src/lib/supabase";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 
 interface Profile {
   id: string;
@@ -135,36 +136,72 @@ export default function CandidateDashboard() {
   return (
     <div className="min-h-screen bg-[#F8FAFC] px-4 py-12 text-slate-800 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-6xl">
+
         {/* Dashboard Header */}
         <div className="mb-10 border-b border-slate-100 pb-6">
-          <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
-            <div className="flex items-start gap-4">
-              <Link href="/profile">
-                <img
-                  src="/default_avatar.png"
-                  alt="Profile"
-                  className="h-16 w-16 rounded-full border border-slate-200 object-cover shadow-sm"
-                />
-              </Link>
+          <div className="flex flex-col gap-6">
 
-              <div>
-                <h1 className="text-3xl font-extrabold tracking-tight text-[#1E293B]">
-                  Candidate Dashboard
-                </h1>
-                <p className="mt-2 text-sm text-slate-500 sm:text-base">
-                  Welcome, {profile?.email || "Candidate"}
-                </p>
+
+            <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+
+              {/* Profile + Title */}
+              <div className="flex items-center justify-center gap-8">
+                <Link href="/profile">
+                  <Image
+                    src="/default_avatar.png"
+                    alt="Profile"
+                    width={64}
+                    height={64}
+                    className="h-16 w-16 rounded-full border border-slate-200 object-cover shadow-sm"
+                  />
+                </Link>
+
+                <div>
+                  <h1 className="text-3xl font-extrabold tracking-tight text-[#1E293B]">
+                    Candidate Dashboard
+                  </h1>
+                  <p className="mt-2 text-sm text-slate-500 sm:text-base">
+                    Welcome, {profile?.email || "Candidate"}
+                  </p>
+                </div>
+
+              {/* Utility Actions */}
+              <div className="flex flex-wrap items-center justify-center gap-2"> 
+                <button
+                  type="button"
+                  onClick={() => router.push("/")}
+                  className="inline-flex items-center gap-2 rounded-xl border border-blue-200 px-4 py-2 text-sm font-semibold text-blue-600 transition hover:bg-blue-50"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-4 w-4"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M10 19l-7-7m0 0l7-7m-7 7h18"
+                      />
+                  </svg>
+                  Home
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleLogout}
+                  className="inline-flex items-center justify-center rounded-xl border border-red-200 bg-red-50 px-5 py-3 text-sm font-bold text-red-600 transition hover:bg-red-100 hover:text-red-700"
+                >
+                  Logout
+                </button>
               </div>
-              <button
-                type="button"
-                onClick={handleLogout}
-                className="inline-flex items-center justify-center rounded-xl border border-red-200 bg-red-50 px-5 py-3 text-sm font-bold text-red-600 transition hover:bg-red-100 hover:text-red-700"
-              >
-                Logout
-              </button>
             </div>
+          </div>
 
-            <div className="flex flex-col gap-3 justify-center sm:flex-row sm:items-center">
+          {/* Primary Actions */}
+          <div className="flex flex-wrap items-center justify-center gap-3">
 
               <Link
                 href="/candidate/applications"
@@ -186,7 +223,6 @@ export default function CandidateDashboard() {
                 </svg>
                 View Applications
               </Link>
-              
             </div>
           </div>
         </div>
@@ -316,12 +352,12 @@ export default function CandidateDashboard() {
                     </div>
 
                     <span
-                      className={`inline-flex w-fit rounded-full px-3 py-1 text-xs font-bold capitalize ${
+                      className={`inline-flex w-fit rounded px-3 py-1 text-md font-bold capitalize ${
                         app.status === "accepted"
-                          ? "bg-green-100 text-green-700"
+                          ? "text-green-700"
                           : app.status === "rejected"
-                          ? "bg-red-100 text-red-700"
-                          : "bg-orange-100 text-orange-700"
+                          ? "text-red-700"
+                          : "text-orange-700"
                       }`}
                     >
                       {app.status}
